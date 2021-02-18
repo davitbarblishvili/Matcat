@@ -6,11 +6,15 @@ functions will occur in similar ways to the Wolfram language (see
 https://reference.wolfram.com/language/guide/MatricesAndLinearAlgebra.html). Matcat aims to
 mimic functionality from Java and C.
 
-Our primary goals are:
+Our primary goals are: 
+
 ● To simplify operations on matrices. Examples of these include row reduction, computing
 transformations, finding eigenvalues/eigenvectors, diagonalizing/transposing a matrix,
-performing the Gram-Schmidt process to find orthogonal bases, and others.
-● To achieve Java-like syntax
+performing the Gram-Schmidt process to find orthogonal bases, and others;
+
+● To achieve Java-like syntax;
+
 ● To allow users to write readable code; matrix/vector structures and the operators must
-mirror mathematical symbols and read intuitively
-● Compile time optimizations (static typing)
+mirror mathematical symbols and read intuitively;
+
+● Compile time optimizations (static typing);
