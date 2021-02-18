@@ -165,46 +165,40 @@ rref                     A function that takes one argument - a matrix -       r
                          determines whether or not a matrix is in rref form.
 ● Control flow
 
-       -   The following keywords are reserved for control flow, and work like in Java:
+      - The following keywords are reserved for control flow, and work like in Java:
 
            if...else, while, for().
 
 ● Function/function declaration
 
-       -   Matcat supports function declaration in the following syntax:
+      - Matcat supports function declaration in the following syntax:
+         
+         func myFunction(dataType x, dataType y, ...) returnType1 return Type 2, ... {}
 
+      - We are going to allow the returning multiple data types; explicit order of the
+         
+         return types is going to be in the function declaration. 
 
-
-
-       -   We are going to allow the returning multiple data types; explicit order of the
-
-           return types is going to be in the function declaration. Means of capturing
-
-           multiple return types:
-
-
-
-
--   Previously declared x can be assigned, while y must be explicitly typed. This order must
+      - Previously declared x can be assigned, while y must be explicitly typed. This order must
 
     match that of the function declaration.
 
 ● Comments
 
-       -   Single line comment → // This is a comment line
+      - Single line comment → // This is a comment line
 
-       -   Multi line comment → /* this is a comment line but over multiple lines */
+      - Multi line comment → /* this is a comment line but over multiple lines */
 
 ● Memory
-       -   The Matcat language will be ”pass by reference,” as in Java, and we are going to
+     - The Matcat language will be ”pass by reference,” as in Java, and we are going to
 
-           implement a memory management system that will be handled internally by a
+       implement a memory management system that will be handled internally by a
 
-           simple garbage collector (just like in Java).
+       simple garbage collector (just like in Java).
 
-       -   To allocate data on the heap, we are going to use a keyword → new.
+     - To allocate data on the heap, we are going to use a keyword → new.
 
 
 
 ● User Defined Types
-     - Matcat will allow for lightweight structs, similar to C. Example:
+     - Matcat will allow for lightweight structs, similar to C.
