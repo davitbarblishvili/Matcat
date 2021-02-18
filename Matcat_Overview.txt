@@ -20,31 +20,29 @@ Our primary goals are:
 
    ● To simplify operations on matrices. Examples of these include row reduction, computing
 
-       transformations, finding eigenvalues/eigenvectors, diagonalizing/transposing a matrix,
+     transformations, finding eigenvalues/eigenvectors, diagonalizing/transposing a matrix,
 
-       performing the Gram-Schmidt process to find orthogonal bases, and others.
+     performing the Gram-Schmidt process to find orthogonal bases, and others.
 
    ● To achieve Java-like syntax
 
    ● To allow users to write readable code; matrix/vector structures and the operators must
 
-       mirror mathematical symbols and read intuitively
+     mirror mathematical symbols and read intuitively
 
    ● Compile time optimizations (static typing)
    
 2 Language Details
 
-      ● Data Types and Operations
+   ● Data Types and Operations
 
-      Matcat will include the core data types of Java - int, char, float, string, boolean. In
+    Matcat will include the core data types of Java - int, char, float, string, boolean. In
 
-addition, the data types matrix and vector will be implemented in order to help programmers
+    addition, the data types matrix and vector will be implemented in order to help programmers
 
-perform linear algebra and optimize their operations at compile time. See table below for
+    perform linear algebra and optimize their operations at compile time. See table below for
 
-description of operations. In line with Java, Matcat will be explicitly typed.
-
-
+    description of operations. In line with Java, Matcat will be explicitly typed.
 
 
 Data Type       Description              Operations                         Examples
@@ -116,15 +114,15 @@ matrix          Essentially a 2D         * Product of two matrices         [[1, 
 
     ● Keywords
 
-         The following words are reserved in Matcat and can not be used for any other purpose
+    The following words are reserved in Matcat and can not be used for any other purpose
+    
+    outside of their defined functionality → {while, for, if, else, return, true, false, int, float, char,
+     
+    bool, string, new, print}. In addition to these typically reserved words, we are going to add a few
 
-outside of their defined functionality → {while, for, if, else, return, true, false, int, float, char,
-      bool, string, new, print}. In addition to these typically reserved words, we are going to add a few
+    new keywords that would be useful to efficiently manipulate the matrices → {inverse, transpose,
 
-      new keywords that would be useful to efficiently manipulate the matrices → {inverse, transpose,
-
-      scalar, dim, det, rref}
-
+    scalar, dim, det, rref}
 
 
 
@@ -181,7 +179,7 @@ rref                     A function that takes one argument - a matrix -       r
 
       - Previously declared x can be assigned, while y must be explicitly typed. This order must
 
-    match that of the function declaration.
+        match that of the function declaration.
 
 ● Comments
 
@@ -197,8 +195,6 @@ rref                     A function that takes one argument - a matrix -       r
        simple garbage collector (just like in Java).
 
      - To allocate data on the heap, we are going to use a keyword → new.
-
-
 
 ● User Defined Types
      - Matcat will allow for lightweight structs, similar to C.
