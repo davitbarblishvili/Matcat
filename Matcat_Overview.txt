@@ -1,10 +1,10 @@
-                   The Matcat Language Proposal
+                                                        The Matcat Language Proposal
 
-               Davit Barblishvili, Mariam Khmaladze, James Ryan, Andreas Cheng
+                                           Davit Barblishvili, Mariam Khmaladze, James Ryan, Andreas Cheng
 
 
 
-1 Overview of Language - Sarah
+1 Overview of Language
 
        The Matcat language is an imperative, mathematically-inclined language whose goal is to
 
@@ -31,11 +31,12 @@ Our primary goals are:
        mirror mathematical symbols and read intuitively
 
    ● Compile time optimizations (static typing)
-2 Language Details - Davit and James
+   
+2 Language Details
 
       ● Data Types and Operations
 
-         Matcat will include the core data types of Java - int, char, float, string, boolean. In
+      Matcat will include the core data types of Java - int, char, float, string, boolean. In
 
 addition, the data types matrix and vector will be implemented in order to help programmers
 
@@ -79,34 +80,34 @@ float           A 8-byte floating        =, ==, !=, +, -, *, /, %, ++, –,   3 
                 point number bytes       +=, - =, <, >, =<, >=
 
 
-vector          Analogous to array -         + Vector addition             [1, 0] + [0, 1 ] → [1 1]
+vector          Analogous to array -      + Vector addition                [1, 0] + [0, 1 ] → [1 1]
 
-                holds a list of int or       -   Vector subtraction        [2, 3] ​.​ [3, 4] → 18
+                holds a list of int or    - Vector subtraction             [2, 3] . [3, 4] → 18
 
-                float; immutable size * Vector Multiplication              [1, 2, 3] x [4, 5, 6 ] → [-3, 6, -3]
+                float; immutable size     * Vector Multiplication          [1, 2, 3] x [4, 5, 6 ] → [-3, 6, -3]
 
-                once instantiated, but .​ Dot product                      5 + [10, 5] → [15, 10]
+                once instantiated, but    . Dot product                    5 + [10, 5] → [15, 10]
 
-                indexes can be           x Cross Product                   Indexing
+                indexes can be            x Cross Product                  Indexing -> v[0]
 
-                reassigned               *​.​ Product with a scalar        v[0]
+                reassigned                *.Product with a scalar           
 
-                                         +​.​ Addition by a scalar
+                                          +. Addition by a scalar
 
-                                         == Vector equality
+                                          == Vector equality
 
 
 matrix          Essentially a 2D         * Product of two matrices         [[1, 2], [3, 4 ]] *
 
                 array, composed of       * Product with a vector           [[5, 6], [19, 22]] →
 
-                vectors; immutable       *​.​ Product with a scalar        [[19, 22], [43, 50]]
+                vectors; immutable       *.Product with a scalar           [[19, 22], [43, 50]]
 
-                dimensions after         +​.​ Addition by a scalar
+                dimensions after         +.Addition by a scalar
 
-                declaration                  + Matrix addition             [1, 2] *v [[6, 7], [2, 3]] → [20, 8]
+                declaration              + Matrix addition                 [1, 2] *v [[6, 7], [2, 3]] → [20, 8]
 
-                                             -   Matrix subtraction
+                                         - Matrix subtraction
 
                                          == Matrix equality                m[0] → returns vector
 
@@ -207,5 +208,3 @@ rref                     A function that takes one argument - a matrix -       r
 
 ● User Defined Types
      - Matcat will allow for lightweight structs, similar to C. Example:
-3 Examples - Mariam
-
