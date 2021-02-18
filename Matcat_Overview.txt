@@ -1,0 +1,211 @@
+                   The Matcat Language Proposal
+
+               Davit Barblishvili, Mariam Khmaladze, James Ryan, Andreas Cheng
+
+
+
+1 Overview of Language - Sarah
+
+       The Matcat language is an imperative, mathematically-inclined language whose goal is to
+
+aid in the writing and computation of linear algebra operations. The implementation of these
+
+functions will occur in similar ways to the Wolfram language (see
+
+https://reference.wolfram.com/language/guide/MatricesAndLinearAlgebra.html​). Matcat aims to
+
+mimic functionality from Java and C.
+
+Our primary goals are:
+
+   ● To simplify operations on matrices. Examples of these include row reduction, computing
+
+       transformations, finding eigenvalues/eigenvectors, diagonalizing/transposing a matrix,
+
+       performing the Gram-Schmidt process to find orthogonal bases, and others.
+
+   ● To achieve Java-like syntax
+
+   ● To allow users to write readable code; matrix/vector structures and the operators must
+
+       mirror mathematical symbols and read intuitively
+
+   ● Compile time optimizations (static typing)
+2 Language Details - Davit and James
+
+      ● Data Types and Operations
+
+         Matcat will include the core data types of Java - int, char, float, string, boolean. In
+
+addition, the data types matrix and vector will be implemented in order to help programmers
+
+perform linear algebra and optimize their operations at compile time. See table below for
+
+description of operations. In line with Java, Matcat will be explicitly typed.
+
+
+
+
+Data Type       Description              Operations                         Examples
+
+
+int             4 byte integer           =, ==, !=, +, -, *, /, %, ++, –,   4+5 → 9
+
+                                         >>, <<, +=, -=, <, >, =<, >=       9 == 9 → True
+
+                                                                            9 =< 1 → False
+
+                                                                            2 << 1 → 4
+
+                                                                            int x = 16;
+
+
+char            1 byte data type         =, ==, !=, +, ++, –, <, >, =<,     ‘A’ == ‘A’ → True
+
+                holding character        >=                                 ‘A’ + 32 → ‘a’
+
+
+boolean         1 byte, evaluates to     =, ==, !=, !, &&, ||               True || False → True
+
+                True/False                                                  True && False → False
+
+
+string          Array of chars           =, ==, !=, <, >, =<, >=, +         “Hello” > “World” → True
+
+                                                                            “a” + “b” → “ab”
+
+
+float           A 8-byte floating        =, ==, !=, +, -, *, /, %, ++, –,   3 + 4.0 = 7.0
+                point number bytes       +=, - =, <, >, =<, >=
+
+
+vector          Analogous to array -         + Vector addition             [1, 0] + [0, 1 ] → [1 1]
+
+                holds a list of int or       -   Vector subtraction        [2, 3] ​.​ [3, 4] → 18
+
+                float; immutable size * Vector Multiplication              [1, 2, 3] x [4, 5, 6 ] → [-3, 6, -3]
+
+                once instantiated, but .​ Dot product                      5 + [10, 5] → [15, 10]
+
+                indexes can be           x Cross Product                   Indexing
+
+                reassigned               *​.​ Product with a scalar        v[0]
+
+                                         +​.​ Addition by a scalar
+
+                                         == Vector equality
+
+
+matrix          Essentially a 2D         * Product of two matrices         [[1, 2], [3, 4 ]] *
+
+                array, composed of       * Product with a vector           [[5, 6], [19, 22]] →
+
+                vectors; immutable       *​.​ Product with a scalar        [[19, 22], [43, 50]]
+
+                dimensions after         +​.​ Addition by a scalar
+
+                declaration                  + Matrix addition             [1, 2] *v [[6, 7], [2, 3]] → [20, 8]
+
+                                             -   Matrix subtraction
+
+                                         == Matrix equality                m[0] → returns vector
+
+
+
+
+    ● Keywords
+
+         The following words are reserved in Matcat and can not be used for any other purpose
+
+outside of their defined functionality → {while, for, if, else, return, true, false, int, float, char,
+      bool, string, new, print}. In addition to these typically reserved words, we are going to add a few
+
+      new keywords that would be useful to efficiently manipulate the matrices → {inverse, transpose,
+
+      scalar, dim, det, rref}
+
+
+
+
+Keyword                  Description                                           Example
+
+
+inverse                  A function that is going to take a matrix data type   inverse(matrix1) → matrix2;
+
+                         and return a new matrix in inverse form.
+
+
+transpose                A function that is going to take a matrix data type   transpose(matrix1) → matrix2;
+
+                         and return a new matrix in its transpose form.
+
+
+scalar                   A function that is going to take two arguments - a    scalar(matrix1, 3) → matrix2;
+
+                         scalar, and matrix - and perform scalar
+
+                         multiplication and return a new matrix.
+
+
+dim                      A function that takes one argument - a matrix -       dim(matrix1) → 2X3.
+
+                         and returns a dimension of it.
+
+
+det                      A function that takes one argument - a matrix -       det(matrix1) → -4;
+
+                         and returns a determinant value of it.
+
+
+rref                     A function that takes one argument - a matrix -       rref(matrix1) → True;
+
+                         and returns boolean value {true/false}. rref
+
+                         determines whether or not a matrix is in rref form.
+● Control flow
+
+       -   The following keywords are reserved for control flow, and work like in Java:
+
+           if...else, while, for().
+
+● Function/function declaration
+
+       -   Matcat supports function declaration in the following syntax:
+
+
+
+
+       -   We are going to allow the returning multiple data types; explicit order of the
+
+           return types is going to be in the function declaration. Means of capturing
+
+           multiple return types:
+
+
+
+
+-   Previously declared x can be assigned, while y must be explicitly typed. This order must
+
+    match that of the function declaration.
+
+● Comments
+
+       -   Single line comment → // This is a comment line
+
+       -   Multi line comment → /* this is a comment line but over multiple lines */
+
+● Memory
+       -   The Matcat language will be ”pass by reference,” as in Java, and we are going to
+
+           implement a memory management system that will be handled internally by a
+
+           simple garbage collector (just like in Java).
+
+       -   To allocate data on the heap, we are going to use a keyword → new.
+
+
+
+● User Defined Types
+     - Matcat will allow for lightweight structs, similar to C. Example:
+3 Examples - Mariam
+
