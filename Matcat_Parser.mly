@@ -100,7 +100,7 @@ expr_opt:
 
 expr:
     LITERAL          { Literal($1)            }
-  | FLIT	     { Fliteral($1)           }
+  | FLOATLIT	     { Fliteral($1)           }
   | BLIT             { BoolLit($1)            }
   | ID               { Id($1)                 }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
@@ -123,8 +123,8 @@ expr:
   /* added */
   | expr CR     expr { Binop($1,Cr,$3)}
   | expr DOT    expr { Binop($1,Dot,$3)}
-  | LBRACK matrix_value RBRACK {()}
-  | LBRACK vector_value RBRACK {()}
+  | LBRACK matrix_value RBRACK { MatrixLit($2)}
+  | LBRACK vector_value RBRACK { VectorLit($2)}
 
 args_opt:
     /* nothing */ { [] }
