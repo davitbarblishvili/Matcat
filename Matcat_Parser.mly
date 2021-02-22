@@ -13,6 +13,7 @@ open ()
 %token <bool> BLIT
 %token <string> ID FLOATLIT
 %token <string> STRINGLIT
+%token <char> CHARLIT
 %token EOF
 
 start program
@@ -68,6 +69,7 @@ typ:
     INT   { Int   }
   | BOOL  { Bool  }
   | FLOAT { Float }
+  | CHAR  { Char  }
   | VOID  { Void  }	
   | MATRIX{ Matrix}
   | VECTOR{ Vector}
@@ -100,8 +102,10 @@ expr_opt:
 
 expr:
     LITERAL          { Literal($1)            }
-  | FLOATLIT	     { Fliteral($1)           }
+  | FLOATLIT	       { Fliteral($1)           }
   | BLIT             { BoolLit($1)            }
+  | STRINGLIT        { StringLit($1)          }
+  | CHARLIT          { CharLit($1)            }
   | ID               { Id($1)                 }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
