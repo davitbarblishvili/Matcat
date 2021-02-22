@@ -47,11 +47,11 @@ fdecl:
 	/* added FUNC, also types which will be what types it returns */
    FUNC ID LPAREN formals_opt RPAREN types LBRACE vdecl_list stmt_list RBRACE
      { { 
-	 fname = $1;
-	 formals = List.rev $3;
-	 typs=$5;
-	 locals = List.rev $7;
-	 body = List.rev $8 } }
+	 fname = $2;
+	 formals = List.rev $4;
+	 typs=$6;
+	 locals = List.rev $8;
+	 body = List.rev $9 } }
 formals_opt:
     /* nothing */ { [] }
   | formal_list   { $1 }
@@ -62,7 +62,7 @@ formal_list:
 /* either we have 1 type or a lot seperated by comma */
 types:
     typ              {($1)}
-  | types COMMA typ  {$2::$1}
+  | types COMMA typ  {$3::$1}
 /* added matrix and vector in types */
 typ:
     INT   { Int   }
@@ -121,6 +121,12 @@ expr:
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
   /* added */
-  | expr CR     expr {()}
-  | expr DOT    expr {()}
-  
+  | expr CR     expr { Binop($1,Cr,$3)}
+  | expr DOT    expr { Binop($1,Dot,$3)}
+
+args_opt:
+    /* nothing */ { [] }
+  | args_list  { List.rev $1 }
+args_list:
+    expr                    { [$1] }
+  | args_list COMMA expr { $3 :: $1 }
