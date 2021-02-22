@@ -1,7 +1,7 @@
 /* Ocamlyacc parser for MicroC */
 
 %{
-open Ast
+open ()
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
@@ -27,6 +27,7 @@ start program
 %left PLUS MINUS
 %left TIMES DIVIDE
 %right NOT
+
 /* here will add inverse and transpose I think*/
 %left CR DOT
 
