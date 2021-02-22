@@ -6,7 +6,7 @@ open ()
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN RBRACK LBRACK
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID
+%token RETURN IF ELSE FOR WHILE INT BOOL FLOAT CHAR VOID
 /* added */
 %token CR DOT MATRIX VECTOR FUNC 
 %token <int> LITERAL
@@ -16,7 +16,7 @@ open ()
 %token <char> CHARLIT
 %token EOF
 
-start program
+%start program
 %type <Ast.program> program
 
 %nonassoc NOELSE
@@ -35,8 +35,8 @@ start program
 %%
 
 
-/*program:
-  decls EOF { $1 }*/
+program:
+  decls EOF { $1 }
   
 decls:
    /* nothing */ { ([], [])               }
@@ -143,4 +143,4 @@ vector_value:
    
 matrix_value:
     args_list               {$1}
-  | agrs_list SEMI matrix_value {()}
+  | args_list SEMI matrix_value {()}
