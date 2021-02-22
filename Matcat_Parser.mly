@@ -11,7 +11,8 @@ open ()
 %token CR DOT MATRIX VECTOR FUNC 
 %token <int> LITERAL
 %token <bool> BLIT
-%token <string> ID FLIT
+%token <string> ID FLOATLIT
+%token <string> STRINGLIT
 %token EOF
 
 start program
@@ -27,14 +28,14 @@ start program
 %left PLUS MINUS
 %left TIMES DIVIDE
 %right NOT
-
 /* here will add inverse and transpose I think*/
 %left CR DOT
 
 %%
 
-program:
-  decls EOF { $1 }
+
+/*program:
+  decls EOF { $1 }*/
   
 decls:
    /* nothing */ { ([], [])               }
