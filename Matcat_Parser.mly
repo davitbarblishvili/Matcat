@@ -4,10 +4,10 @@
 open ()
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN RBRACK LBRACK
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT VOID
-/* added do we not have to add keyword print also?*/
+/* added */
 %token CR DOT MATRIX VECTOR FUNC 
 %token <int> LITERAL
 %token <bool> BLIT
@@ -123,10 +123,20 @@ expr:
   /* added */
   | expr CR     expr { Binop($1,Cr,$3)}
   | expr DOT    expr { Binop($1,Dot,$3)}
+  | LBRACK matrix_value RBRACK {()}
+  | LBRACK vector_value RBRACK {()}
 
 args_opt:
     /* nothing */ { [] }
   | args_list  { List.rev $1 }
+  
 args_list:
     expr                    { [$1] }
   | args_list COMMA expr { $3 :: $1 }
+  
+vector_value:
+   args_list                {$1}
+   
+matrix_value:
+    args_list               {$1}
+  | agrs_list SEMI matrix_value {()}
