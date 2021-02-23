@@ -19,7 +19,7 @@ open ()
 %start program
 %type <Ast.program> program
 
-%nonassoc NOELSE
+%nonassoc NOELSE /* above? */
 %nonassoc ELSE
 %right ASSIGN
 %left OR
@@ -46,7 +46,7 @@ decls:
 fdecl:
     /* if this is func decl, how do we write that we can return as much var as we want */
 	/* added FUNC, also types which will be what types it returns */
-   FUNC ID LPAREN formals_opt RPAREN types LBRACE vdecl_list stmt_list RBRACE
+   FUNC ID LPAREN formals_opt RPAREN types LBRACE vdecl_list stmt_list RBRACE 
      { { 
 	 fname = $2;
 	 formals = List.rev $4;
@@ -54,7 +54,7 @@ fdecl:
 	 locals = List.rev $8;
 	 body = List.rev $9 } }
 formals_opt:
-    /* nothing */ { [] }
+    /* nothing */ { [] } /* is this how you define type of formal_list */
   | formal_list   { $1 }
 
 formal_list:
@@ -90,7 +90,7 @@ stmt:
   | RETURN expr_opt SEMI                    { Return $2             }
   /* not sure about this one it seems smth like { }  */
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
-  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
+  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) } /* %prec? */
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7)        }
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
                                             { For($3, $5, $7, $9)   }
@@ -127,7 +127,7 @@ expr:
   /* added */
   | expr CR     expr { Binop($1,Cr,$3)}
   | expr DOT    expr { Binop($1,Dot,$3)}
-  | LBRACK matrix_value RBRACK { MatrixLit($2)}
+  | LT matrix_value GT { MatrixLit($2)}
   | LBRACK vector_value RBRACK { VectorLit($2)}
 
 args_opt:
@@ -141,6 +141,11 @@ args_list:
 vector_value:
    args_list                {$1}
    
-matrix_value:
+/* matrix_value:
     args_list               {$1}
-  | args_list SEMI matrix_value {()}
+  | args_list SEMI matrix_value {()} */
+
+matrix_value:
+  LBRACK args_list RBRACK {}
+ | LBRACK args_list RBRACK COMMA matrix_value {}
+ | LBRACK args_list RBRACK matrix_value {}
