@@ -12,6 +12,9 @@ type token =
   | ASSIGN
   | RBRACK
   | LBRACK
+  | TRANSPOSE
+  | INVERSE
+  | STRUCT
   | NOT
   | EQ
   | NEQ
@@ -45,4 +48,4 @@ type token =
   | EOF
 
 val program :
-  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> Ast.program
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> ().program

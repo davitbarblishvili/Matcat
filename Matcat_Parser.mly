@@ -4,7 +4,8 @@
 open ()
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN RBRACK LBRACK
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN RBRACK LBRACK TRANSPOSE INVERSE
+%token STRUCT
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
 %token RETURN IF ELSE FOR WHILE INT BOOL FLOAT CHAR VOID
 /* added */
@@ -17,7 +18,7 @@ open ()
 %token EOF
 
 %start program
-%type <Ast.program> program
+%type <().program> program
 
 %nonassoc NOELSE /* above? */
 %nonassoc ELSE
@@ -28,9 +29,10 @@ open ()
 %left LT GT LEQ GEQ
 %left PLUS MINUS
 %left TIMES DIVIDE
-%right NOT
-/* here will add inverse and transpose I think*/
 %left CR DOT
+%right NOT
+%left TRANSPOSE INVERSE
+/* here will add inverse and transpose I think*/
 
 %%
 
@@ -121,6 +123,8 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3)   }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
+  | TRANSPOSE expr   { Unop(Transpose, $2)    }
+  | INVERSE expr     { Unop(Inverse, $2)      }
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
@@ -146,6 +150,8 @@ vector_value:
   | args_list SEMI matrix_value {()} */
 
 matrix_value:
-  LBRACK args_list RBRACK {}
+   LBRACK args_list RBRACK {}
  | LBRACK args_list RBRACK COMMA matrix_value {}
  | LBRACK args_list RBRACK matrix_value {}
+
+
