@@ -93,7 +93,7 @@ stmt:
   | RETURN expr_opt SEMI                    { Return $2             }
   /* not sure about this one it seems smth like { }  */
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
-  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) } /* %prec? */
+  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) } /* %prec? https://caml.inria.fr/pub/docs/manual-ocaml/lexyacc.html#ss:ocamlyacc-rules*/
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7)        }
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
                                             { For($3, $5, $7, $9)   }
@@ -130,11 +130,13 @@ expr:
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
   /* added */
-  | LBRACK args_opt RBRACK {SeqLit($2)}
-  | expr CR expr     { Binop($1,Cr,$3)}
-  | expr DOT expr    { Binop($1,Dot,$3)}
-  | LT matrix_value SEMI GT { MatrixLit($2)}
+  | LBRACK args_opt RBRACK              {SeqLit($2)}
+  | expr CR expr                  { Binop($1,Cr,$3)}
+  | expr DOT expr                { Binop($1,Dot,$3)}
   | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
+  | LT matrix_value SEMI GT         { MatrixLit($2)}
+  | LBRACK vector_value SEMI RBRACK LBRACK expr RBRACK { VectorElm($2,$6)}
+  | LT matrix_value SEMI GT LBRACK args_opt RBRACK { MatrixElm($2,$6)}
 
 args_opt:
     /* nothing */ { [] }
