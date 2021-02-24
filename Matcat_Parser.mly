@@ -76,6 +76,7 @@ typ:
   | MATRIX{ Matrix}
   | VECTOR{ Vector}
 
+
 vdecl_list:
     /* nothing */    { [] }
   | vdecl_list vdecl { $2 :: $1 }
@@ -129,29 +130,33 @@ expr:
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
   /* added */
-  | expr CR     expr { Binop($1,Cr,$3)}
-  | expr DOT    expr { Binop($1,Dot,$3)}
-  | LT matrix_value GT { MatrixLit($2)}
-  | LBRACK vector_value RBRACK { VectorLit($2)}
+  | LBRACK args_opt RBRACK {SeqLit($2)}
+  | expr CR expr     { Binop($1,Cr,$3)}
+  | expr DOT expr    { Binop($1,Dot,$3)}
+  | LT matrix_value SEMI GT { MatrixLit($2)}
+  | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
 
 args_opt:
     /* nothing */ { [] }
   | args_list  { List.rev $1 }
+
+args_opt_vector:
+    {[]}
+  | args_list_vector  { List.rev $1 }
+
+args_list_vector:
+    expr       {[$1]}
   
 args_list:
     expr                    { [$1] }
   | args_list COMMA expr { $3 :: $1 }
-  
-vector_value:
-   args_list                {$1}
-   
-/* matrix_value:
-    args_list               {$1}
-  | args_list SEMI matrix_value {()} */
 
 matrix_value:
-   LBRACK args_list RBRACK {}
- | LBRACK args_list RBRACK COMMA matrix_value {}
- | LBRACK args_list RBRACK matrix_value {}
+   args_opt  {[$1]}
+ | matrix_value SEMI args_opt {$3 :: $1}
+
+vector_value:
+ args_opt_vector     {[$1]}
+
 
 
