@@ -32,7 +32,6 @@ open ()
 %left CR DOT
 %right NOT
 %left TRANSPOSE INVERSE
-/* here will add inverse and transpose I think*/
 
 %%
 
@@ -47,7 +46,7 @@ decls:
 
 fdecl:
     /* if this is func decl, how do we write that we can return as much var as we want */
-	/* added FUNC, also types which will be what types it returns */
+	  /* added FUNC, also types which will be what types it returns */
    FUNC ID LPAREN formals_opt RPAREN types LBRACE vdecl_list stmt_list RBRACE 
      { { 
 	 fname = $2;
@@ -56,7 +55,7 @@ fdecl:
 	 locals = List.rev $8;
 	 body = List.rev $9 } }
 formals_opt:
-    /* nothing */ { [] } /* is this how you define type of formal_list */
+    /* nothing */ { [] }
   | formal_list   { $1 }
 
 formal_list:
@@ -93,7 +92,7 @@ stmt:
   | RETURN expr_opt SEMI                    { Return $2             }
   /* not sure about this one it seems smth like { }  */
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
-  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) } /* %prec? https://caml.inria.fr/pub/docs/manual-ocaml/lexyacc.html#ss:ocamlyacc-rules*/
+  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7)        }
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
                                             { For($3, $5, $7, $9)   }
@@ -135,8 +134,13 @@ expr:
   | expr DOT expr                { Binop($1,Dot,$3)}
   | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
   | LT matrix_value SEMI GT         { MatrixLit($2)}
+  | ID LBRACK expr RBRACK { VectorElmFromID($1,$3)}
+  | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElmFromID($1,$3,$6)}
   | LBRACK vector_value SEMI RBRACK LBRACK expr RBRACK { VectorElm($2,$6)}
-  | LT matrix_value SEMI GT LBRACK args_opt RBRACK { MatrixElm($2,$6)}
+  | LT matrix_value SEMI GT LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElm($2,$6)}   //matrix[x][y]
+  /* //Or this:  We will finalize this later.
+  | LT matrix_value SEMI GT LBRACK args_opt RBRACK { MatrixElm($2,$6)}                  //matrix[x,y]
+  */
 
 args_opt:
     /* nothing */ { [] }
