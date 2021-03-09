@@ -1,6 +1,6 @@
 (* Ocamllex scanner for Matcat *)
 
-{ open Parser } 
+{ open Matcat_Parser } 
 
 let digit = ['0' - '9']
 let digits = digit+
