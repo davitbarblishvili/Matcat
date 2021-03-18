@@ -43,7 +43,7 @@ rule token = parse
 | "bool"   { BOOL }
 | "matrix" {MATRIX}
 | "vector" {VECTOR}
-| "float"  { FLOAT }
+| "double"  { DOUBLE }
 | "void"   { VOID }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
