@@ -35,11 +35,14 @@ type stmt =
 | If of expr * stmt * stmt
 | For of expr * expr * expr * stmt
 | While of expr * stmt
+(*our func lists return types before body of the funct
+Also not sure where to include Funct keyword*)
 
 type func_decl = {
-    typ : data_type;
+    
     fname : string;
     formals : bind list;
+	typs : data_type list;
     locals : bind list;
     body : stmt list;
   }
