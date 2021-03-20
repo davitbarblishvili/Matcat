@@ -1,7 +1,7 @@
-/* Ocamlyacc parser for MicroC */
+/* Ocamlyacc parser for Matcat */
 
 %{
-open ()
+open Ast
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN RBRACK LBRACK TRANSPOSE INVERSE
@@ -12,13 +12,13 @@ open ()
 %token CR DOT MATRIX VECTOR FUNC 
 %token <int> LITERAL
 %token <bool> BLIT
-%token <float> ID DOUBLELIT
+%token <string> ID DOUBLELIT
 %token <string> STRINGLIT
 %token <char> CHARLIT
 %token EOF
 
 %start program
-%type <().program> program
+%type <Ast.program> program
 
 %nonassoc NOELSE /* above? */
 %nonassoc ELSE
@@ -47,11 +47,11 @@ decls:
 fdecl:
     /* if this is func decl, how do we write that we can return as much var as we want */
 	  /* added FUNC, also types which will be what types it returns */
-   FUNC ID LPAREN formals_opt RPAREN types LBRACE vdecl_list stmt_list RBRACE 
+   FUNC ID LPAREN formals_opt RPAREN type_list LBRACE vdecl_list stmt_list RBRACE 
      { { 
 	 fname = $2;
 	 formals = List.rev $4;
-	 typs=$6;
+	 types=$6;
 	 locals = List.rev $8;
 	 body = List.rev $9 } }
 formals_opt:
@@ -61,10 +61,14 @@ formals_opt:
 formal_list:
     typ ID                   { [($1,$2)]     }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
+
+/* func sumAndDiff(int one, int two) int, int { */
+/* This is for the part that function can return more than one type */
 /* either we have 1 type or a lot seperated by comma */
-types:
-    typ              {($1)}
-  | types COMMA typ  {$3::$1}
+type_list:
+    typ              {[($1)]}
+  | type_list COMMA typ  {$3::$1}
+
 /* added matrix and vector in types */
 typ:
     INT   { Int   }
@@ -104,7 +108,7 @@ expr_opt:
 
 expr:
     LITERAL          { Literal($1)            }
-  | DOUBLELIT	       { Doubleliteral($1)           }
+  | DOUBLELIT	       { Doubleliteral($1)      }
   | BLIT             { BoolLit($1)            }
   | STRINGLIT        { StringLit($1)          }
   | CHARLIT          { CharLit($1)            }
@@ -129,15 +133,15 @@ expr:
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
   /* added */
-  | LBRACK args_opt RBRACK              {SeqLit($2)}
+  // | LBRACK args_opt RBRACK              {SeqLit($2)}
   | expr CR expr                  { Binop($1,Cr,$3)}
   | expr DOT expr                { Binop($1,Dot,$3)}
-  | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
-  | LT matrix_value SEMI GT         { MatrixLit($2)}
-  | ID LBRACK expr RBRACK { VectorElmFromID($1,$3)}
-  | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElmFromID($1,$3,$6)}
-  | LBRACK vector_value SEMI RBRACK LBRACK expr RBRACK { VectorElm($2,$6)}
-  | LT matrix_value SEMI GT LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElm($2,$6)}   //matrix[x][y]
+  // | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
+  // | LT matrix_value SEMI GT         { MatrixLit($2)}
+  // | ID LBRACK expr RBRACK { VectorElmFromID($1,$3)}
+  // | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElmFromID($1,$3,$6)}
+  // | LBRACK vector_value SEMI RBRACK LBRACK expr RBRACK { VectorElm($2,$6)}
+  // | LT matrix_value SEMI GT LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElm($2,$6)}   //matrix[x][y]
   /* //Or this:  We will finalize this later.
   | LT matrix_value SEMI GT LBRACK args_opt RBRACK { MatrixElm($2,$6)}                  //matrix[x,y]
   */
@@ -163,6 +167,3 @@ matrix_value:
 
 vector_value:
  args_opt_vector     {[$1]}
-
-
-
