@@ -1,0 +1,6 @@
+
+func main() int
+{
+print("hello world");
+return 0;
+}
