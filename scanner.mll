@@ -1,6 +1,6 @@
 (* Ocamllex scanner for Matcat *)
 
-{ open Matcat_Parser } 
+{ open Matcatparse } 
 
 let digit = ['0' - '9']
 let digits = digit+
@@ -47,10 +47,11 @@ rule token = parse
 | "void"   { VOID }
 | "true"   { BLIT(true)  }
 | "false"  { BLIT(false) }
-| ['0'-'9']+ as lit { INTLIT(int_of_string lit) }
+(* | ['0'-'9']+ as lit { INTLIT(int_of_string lit) } *)    (* Andreas: Umm... I think Literal means INTLIT. I'm not sure what this line means so I comment it first *)
 | '"' ([^ '"']* as lit) '"' { STRINGLIT(lit) }
-| (['0'-'9']*)'.'(['0'-'9']+) as lit { DOUBLELIT(float_of_string lit) }
-| (['0'-'9']+)'.'(['0'-'9']*) as lit { DOUBLELIT(float_of_string lit) }
+| digits as lxm { LITERAL(int_of_string lxm) }
+| digits '.'  digit* ( ['e' 'E'] ['+' '-']? digits )? as lxm { DOUBLELIT(lxm) }
+| ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*     as lxm { ID(lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']*  as lxm { ID(lxm) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }

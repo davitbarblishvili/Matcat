@@ -13,10 +13,11 @@ type unary_operator = Not | Neg | Inverse | Transpose
 type data_type = Int | Char | Double | String | Void | Bool | Matrix | Vector
 
 type expr =
-  Binop of expr * operator * expr
+Literal of int
+| Binop of expr * operator * expr
 | Unop of unary_operator * expr
-| Doubleliteral of float
-| StrLit of string
+| Doubleliteral of string
+| StringLit of string
 | BoolLit of bool
 | CharLit of char
 | MatrixLit of float array array
@@ -25,8 +26,9 @@ type expr =
 | Call of string * expr list
 | Noexpr
 
+(* type bind = data_type * string * expr *)
+type bind = data_type * string
 
-type bind = data_type * string * expr
 
 type stmt =
   Block of stmt list
@@ -39,10 +41,9 @@ type stmt =
 Also not sure where to include Funct keyword*)
 
 type func_decl = {
-    
     fname : string;
     formals : bind list;
-	typs : data_type list;
+	  types : data_type list;
     locals : bind list;
     body : stmt list;
   }
@@ -89,17 +90,17 @@ let string_of_uop = function
 
 
   (* 1) missing let rec string_of_expr; I just included initial lines of each block*)
-  let rec string_of_expr = function 
+  (* let rec string_of_expr = function 
    Noexpr -> ""
 
   (* 2) missing let rec string_of_stmt; I just included initial lines of each block *)
   let rec string_of_stmt = function 
-   Noexpr -> ""
+   Noexpr -> "" *)
 
 
 
   (*variable declaration*)
-  let string_of_vdecl (t, id, _) = string_of_data_type t ^ " " ^ id ^ ";\n"
+  let string_of_vdecl (t, id) = string_of_data_type t ^ " " ^ id ^ ";\n"
 
 
 
@@ -110,8 +111,3 @@ let string_of_uop = function
   let string_of_program (vars, funcs) =
     String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
     String.concat "\n" (List.map string_of_fdecl funcs)
-
-
-
-
-
