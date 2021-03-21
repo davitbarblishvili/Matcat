@@ -8,7 +8,7 @@ matcat.native :
 %.cmi : %.mli
 	ocamlc -c $<
 
-parser.ml : Matcat_Parser.mly
+parser.ml : parser.mly
 	ocamlyacc $^
 
 scanner.ml : scanner.mll
