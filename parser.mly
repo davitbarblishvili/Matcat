@@ -51,7 +51,7 @@ fdecl:
      { { 
 	 fname = $2;
 	 formals = List.rev $4;
-	 types=$6;
+	 types=List.rev $6;
 	 locals = List.rev $8;
 	 body = List.rev $9 } }
 formals_opt:
