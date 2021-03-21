@@ -1,17 +1,17 @@
 (* Ocamllex scanner for Matcat *)
 
-{ open Matcatparse } 
+{ open Parser } 
 
 let digit = ['0' - '9']
 let digits = digit+
 
 rule token = parse
-  [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
-| "/*"     { multi_comment lexbuf }           (* Comments *)
-| "//" { short_comment lexbuf }
-| '('      { LPAREN }
-| ')'      { RPAREN }
+  [' ' '\t' '\r' '\n']  { token lexbuf } (* Whitespace *)
+| "/*"                  { multi_comment lexbuf }           (* Comments *)
+| "//"                  { short_comment lexbuf }
+| '('                   { LPAREN }
 | '{'      { LBRACE }
+| ')'      { RPAREN }
 | '}'      { RBRACE }
 | ';'      { SEMI }
 | ','      { COMMA }
@@ -20,10 +20,10 @@ rule token = parse
 | '*'      { TIMES }
 | '/'      { DIVIDE }
 | '='      { ASSIGN }
-| "transpose" {TRANSPOSE}
-| "inverse"   {INVERSE}
-| "cr"       {CR}
-| "dot"       {DOT}
+| "transpose" { TRANSPOSE }
+| "inverse"   { INVERSE }
+| "cr"       { CR }
+| "dot"       { DOT }
 | "=="     { EQ }
 | "!="     { NEQ }
 | '<'      { LT }
@@ -38,7 +38,7 @@ rule token = parse
 | "for"    { FOR }
 | "while"  { WHILE }
 | "return" { RETURN }
-| "func"   {FUNC}
+| "func"   { FUNC }
 | "int"    { INT }
 | "bool"   { BOOL }
 | "matrix" {MATRIX}
