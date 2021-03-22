@@ -1,6 +1,7 @@
-(* Top-level of the MatCat compiler: scan & parse the input,
-   check the resulting AST and generate an SAST from it, generate LLVM IR,
-   and dump the module *)
+(*
+Date        Author        Changes
+2021-03-22  Andreas       Add basic parts based on MicroC to make hello world works
+*)
 
 type action = Ast | Sast | LLVM_IR | Compile
 
@@ -22,17 +23,11 @@ let () =
   let ast = Parser.program Scanner.token lexbuf in  
   match !action with
     Ast -> print_string (Ast.string_of_program ast)
-  | _ -> (* let sast = Semant.check ast in *)
+  | _ -> let sast = Semant.check ast in
     match !action with
-      Ast     -> ()
-    | Sast    -> ()
-    | LLVM_IR -> ()
-    | Compile -> ()
-    (*
-    | Sast    -> print_string (Sast.string_of_sprogram sast)
-    | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate sast))
-    | Compile -> let m = Codegen.translate sast in
-    
+    Ast     -> ()
+  | Sast    -> print_string (Sast.string_of_sprogram sast)
+  | LLVM_IR -> print_string (Llvm.string_of_llmodule (Codegen.translate sast))
+  | Compile -> let m = Codegen.translate sast in
   Llvm_analysis.assert_valid_module m;
   print_string (Llvm.string_of_llmodule m)
-    *)
