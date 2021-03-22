@@ -26,9 +26,7 @@ Literal of int
 | Call of string * expr list
 | Noexpr
 
-(* type bind = data_type * string * expr *)
 type bind = data_type * string
-
 
 type stmt =
   Block of stmt list
@@ -43,7 +41,7 @@ Also not sure where to include Funct keyword- I figured it out :) *)
 type func_decl = {
     fname : string;
     formals : bind list;
-	types : data_type list;
+	  data_types : data_type list;
     locals : bind list;
     body : stmt list;
   }
@@ -51,9 +49,8 @@ type func_decl = {
 type program = bind list * func_decl list
 
 
-(* Pretty-printing functions *)
-let string_of_operators = function
-Add -> "+"
+let string_of_operator = function
+  Add -> "+"
 | Sub -> "-"
 | Mult -> "*"
 | Div -> "/"
@@ -68,14 +65,11 @@ Add -> "+"
 | Cr -> "cr"
 | Dot -> "dot"
 
-
 let string_of_uop = function
     Neg -> "-"
   | Not -> "!"
   | Transpose -> "Transpose"
   | Inverse -> "Inverse"
-
-
 
 let string_of_data_type = function
     Int -> "int"
@@ -87,34 +81,50 @@ let string_of_data_type = function
   | Vector -> "vector"
   | Void -> "void"
 
+(* Pretty-printing functions *)
 
+let rec string_of_expr = function
+    Literal(l) -> string_of_int l
+    | Binop(e1, o, e2) ->
+      string_of_expr e1 ^ " " ^ string_of_operator o ^ " " ^ string_of_expr e2
+    | Unop(o, e) -> string_of_uop o ^ string_of_expr e
+    | Doubleliteral(l) -> l
+    | StringLit(l) -> l
+    | BoolLit(true) -> "true"   
+    | BoolLit(false) -> "false"
+    | CharLit(l) -> "???"
+    | MatrixLit(l) -> "???"
+    | Id(s) -> s
+    | Assign(v, e) -> v ^ " = " ^ string_of_expr e
+    | Call(f, el) ->
+        f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
+    | Noexpr -> ""
 
-  (* 1) missing let rec string_of_expr; I just included initial lines of each block*)
-  (* let rec string_of_expr = function 
-   Noexpr -> "" *)
-
-  (* 2) missing let rec string_of_stmt; I just included initial lines of each block 
-  let rec string_of_stmt = function 
-   Noexpr -> "" *)
-
-
+let rec string_of_stmt = function
+    Block(stmts) ->
+      "{\n" ^ String.concat "" (List.map string_of_stmt stmts) ^ "}\n"
+  | Expr(expr) -> string_of_expr expr ^ ";\n";
+  | Return(expr) -> "return " ^ string_of_expr expr ^ ";\n";
+  | If(e, s, Block([])) -> "if (" ^ string_of_expr e ^ ")\n" ^ string_of_stmt s
+  | If(e, s1, s2) ->  "if (" ^ string_of_expr e ^ ")\n" ^
+    string_of_stmt s1 ^ "else\n" ^ string_of_stmt s2
+  | For(e1, e2, e3, s) ->
+    "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
+    string_of_expr e3  ^ ") " ^ string_of_stmt s
+  | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
 
   (*variable declaration*)
 let string_of_vdecl (t, id) = string_of_data_type t ^ " " ^ id ^ ";\n"
 
-
-
-  (* 3) missing let string_of_fdcl;  *)
-let string_of_fdecl fdecl =  ""
-(* "func " ^ 
-  fdecl.fname ^ "(" ^ String.concat "," (List.map snd fdecl.formals) ^
-  ")\n{\n" ^ 
-  String.concat "" (List.map string_of_typ fdecl.typ ) ^
+let string_of_fdecl fdecl =
+  "func " ^
+  String.concat "" (List.map string_of_data_type fdecl.data_types) ^
+  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
+  ")\n{\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.locals) ^
   String.concat "" (List.map string_of_stmt fdecl.body) ^
-  "}\n"   *)
+  "}\n"
 
-  
 let string_of_program (vars, funcs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)

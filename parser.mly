@@ -51,7 +51,7 @@ fdecl:
      { { 
 	 fname = $2;
 	 formals = List.rev $4;
-	 types=List.rev $6;
+	 data_types = List.rev $6;
 	 locals = List.rev $8;
 	 body = List.rev $9 } }
 formals_opt:
@@ -71,13 +71,13 @@ type_list:
 
 /* added matrix and vector in types */
 typ:
-    INT   { Int   }
-  | BOOL  { Bool  }
-  | DOUBLE { Double }
-  | CHAR  { Char  }
-  | VOID  { Void  }	
-  | MATRIX{ Matrix}
-  | VECTOR{ Vector}
+    INT     { Int    }
+  | BOOL    { Bool   }
+  | DOUBLE  { Double }
+  | CHAR    { Char   }
+  | VOID    { Void   }	
+  | MATRIX  { Matrix }
+  | VECTOR  { Vector }
 
 
 vdecl_list:
@@ -134,8 +134,8 @@ expr:
   | LPAREN expr RPAREN { $2                   }
   /* added */
   // | LBRACK args_opt RBRACK              {SeqLit($2)}
-  | expr CR expr                  { Binop($1,Cr,$3)}
-  | expr DOT expr                { Binop($1,Dot,$3)}
+  | expr CR expr     { Binop($1,Cr,$3)        }
+  | expr DOT expr    { Binop($1,Dot,$3)       }
   // | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
   // | LT matrix_value SEMI GT         { MatrixLit($2)}
   // | ID LBRACK expr RBRACK { VectorElmFromID($1,$3)}
@@ -151,18 +151,18 @@ args_opt:
   | args_list  { List.rev $1 }
 
 args_opt_vector:
-    {[]}
+    { [] }
   | args_list_vector  { List.rev $1 }
 
 args_list_vector:
-    expr       {[$1]}
+    expr       { [$1] }
   
 args_list:
     expr                    { [$1] }
-  | args_list COMMA expr { $3 :: $1 }
+  | args_list COMMA expr    { $3 :: $1 }
 
 matrix_value:
-   args_opt  {[$1]}
+   args_opt                   { [$1] }
  | matrix_value SEMI args_opt {$3 :: $1}
 
 vector_value:
