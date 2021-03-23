@@ -40,30 +40,6 @@ let translate (globals, functions) =
   let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
 
-  let sqrt_t : L.lltype =
-      L.function_type double_t [| double_t |] in
-  let sqrt_func : L.llvalue =
-      L.declare_function "sqrt" sqrt_t the_module in
-
-  let abs_t : L.lltype =
-      L.function_type i32_t [| i32_t |] in
-  let abs_func : L.llvalue =
-      L.declare_function "abs" abs_t the_module in
-
-  let fabs_t : L.lltype =
-      L.function_type double_t [| double_t |] in
-  let fabs_func : L.llvalue =
-      L.declare_function "fabs" fabs_t the_module in
-
-  let pow_t : L.lltype =
-      L.function_type double_t [| double_t; double_t |] in
-  let pow_func : L.llvalue =
-      L.declare_function "pow" pow_t the_module in
-
-  let log_t : L.lltype =
-      L.function_type double_t [| double_t|] in
-  let log_func : L.llvalue =
-      L.declare_function "log" log_t the_module in
   let matrix_size = Hashtbl.create 12 in
 
   (* Define each function (arguments and return type) so we can
