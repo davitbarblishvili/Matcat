@@ -22,3 +22,11 @@ clean :
 .PHONY : test
 test : testall.sh
 	./testall.sh
+
+# An excluding way to build the tarball
+# may not be a good idea, but let's try for a while
+EXCLUDEPATTERNS = .* *_build* MicroC
+ECSTRING = $(EXCLUDEPATTERNS:%= --exclude="%" )
+tar : clean
+	echo ${ECSTRING}
+	cd .. && tar ${ECSTRING} -cvf matcat/matcat.tar.gz matcat
