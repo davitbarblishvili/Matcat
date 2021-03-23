@@ -58,19 +58,30 @@ let translate (globals, functions) =
     let builder = L.builder_at_end context (L.entry_block the_function) in
 
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
-    and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder in
+    and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder 
+    and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
+    and double_format_str = L.build_global_stringptr "%g\n" "fmt" builder
+    and matrix_format_str = L.build_global_stringptr "%g " "fmt" builder
+    and return_format_str = L.build_global_stringptr "\n" "fmt" builder in
 
     let rec expr builder ((_, e) : sexpr) = match e with
 	SLiteral i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SDoubleliteral l -> L.const_float_of_string double_t l
+      | SStringLit s -> L.build_global_stringptr s "tmp" builder
       | SNoexpr     -> L.const_int i32_t 0
-      | SCall ("print", [e]) | SCall ("printb", [e]) ->
+      | SCall ("print", [e]) ->
 	      L.build_call printf_func [| int_format_str ; (expr builder e) |]
-	    "printf" builder
-      | SCall ("printf", [e]) -> 
-	  L.build_call printf_func [| float_format_str ; (expr builder e) |]
-	    "printf" builder
+        "printf" builder      
+
+      (*Add print functions, other built-in functions*)
+      | SCall ("printStr", [e]) ->
+        L.build_call printf_func [| string_format_str ; (expr builder e) |]
+        "printf" builder
+
+      | SCall ("printd",[e]) ->
+        L.build_call printf_func [| float_format_str ; (expr builder e) |]
+        "printf" builder
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	    let llargs = List.rev (List.map (expr builder) (List.rev args)) in

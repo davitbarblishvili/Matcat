@@ -44,8 +44,8 @@ module StringMap = Map.Make(String)
         locals = []; body = [] } map
       in List.fold_left add_bind StringMap.empty [ ("print", Int);
                                  ("printb", Bool);
-                                 ("printf", Double);
-                                 ("printbig", Int) ]
+                                 ("printd", Double);
+                                 ("printStr", String) ]
     in
   
     (* Add function name to symbol table *)

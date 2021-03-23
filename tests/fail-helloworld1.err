@@ -1,2 +1,1 @@
-Fatal error: exception Failure("text outside the quotation")
-
+Fatal error: exception Failure("illegal character "")
