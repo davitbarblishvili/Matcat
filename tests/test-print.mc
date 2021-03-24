@@ -1,7 +1,8 @@
-func main() int
+func main() string
 {
     printStr("hello world");
-    return 0;
+    return "h";
+
 
    
 }

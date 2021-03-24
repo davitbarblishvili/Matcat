@@ -65,10 +65,10 @@ let translate (globals, functions) =
     and return_format_str = L.build_global_stringptr "\n" "fmt" builder in
 
     let rec expr builder ((_, e) : sexpr) = match e with
-	SLiteral i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SDoubleliteral l -> L.const_float_of_string double_t l
       | SStringLit s -> L.build_global_stringptr s "tmp" builder
+      | SIntLit i -> L.const_int i32_t i
       | SNoexpr     -> L.const_int i32_t 0
       | SCall ("print", [e]) ->
 	      L.build_call printf_func [| int_format_str ; (expr builder e) |]
