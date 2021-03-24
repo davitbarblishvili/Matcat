@@ -7,7 +7,7 @@ open Ast
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN RBRACK LBRACK TRANSPOSE INVERSE
 %token STRUCT
 %token NOT EQ NEQ LT LEQ GT GEQ AND OR
-%token RETURN IF ELSE FOR WHILE INT BOOL DOUBLE CHAR VOID
+%token RETURN IF ELSE FOR WHILE INT BOOL DOUBLE CHAR STRING VOID
 /* added */
 %token CR DOT MATRIX VECTOR FUNC 
 %token <int> INTLIT
@@ -78,6 +78,7 @@ typ:
   | VOID    { Void   }	
   | MATRIX  { Matrix }
   | VECTOR  { Vector }
+  | STRING  { String }
 
 
 vdecl_list:
@@ -107,8 +108,8 @@ expr_opt:
   | expr          { $1 }  
 
 expr:
-    INTLIT         { IntLit($1)            }
-  | DOUBLELIT	       { Doubleliteral($1)      }
+    INTLIT           { IntLit($1)            }
+  | DOUBLELIT	       { DoubleLiteral($1)      }
   | BLIT             { BoolLit($1)            }
   | STRINGLIT        { StringLit($1)          }
   | CHARLIT          { CharLit($1)            }

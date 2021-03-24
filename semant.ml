@@ -97,7 +97,7 @@ module StringMap = Map.Make(String)
       (* Return a semantically-checked expression, i.e., with a type *)
       let rec expr = function
           IntLit l -> (Int, SIntLit l)
-        | Doubleliteral l -> (Double, SDoubleliteral l)
+        | DoubleLiteral l -> (Double, SDoubleLiteral l)
         | BoolLit l  -> (Bool, SBoolLit l)
         | Noexpr     -> (Void, SNoexpr)
         | CharLit l ->(Char, SCharLit l)        (* TODO: review *)

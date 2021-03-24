@@ -66,7 +66,7 @@ let translate (globals, functions) =
 
     let rec expr builder ((_, e) : sexpr) = match e with
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
-      | SDoubleliteral l -> L.const_float_of_string double_t l
+      | SDoubleLiteral l -> L.const_float_of_string double_t l
       | SStringLit s -> L.build_global_stringptr s "tmp" builder
       | SIntLit i -> L.const_int i32_t i
       | SNoexpr     -> L.const_int i32_t 0

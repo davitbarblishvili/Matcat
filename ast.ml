@@ -16,7 +16,7 @@ type expr =
   IntLit of int
 | Binop of expr * operator * expr
 | Unop of unary_operator * expr
-| Doubleliteral of string
+| DoubleLiteral of string
 | StringLit of string
 | BoolLit of bool
 | CharLit of char
@@ -88,7 +88,7 @@ let rec string_of_expr = function
      Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_operator o ^ " " ^ string_of_expr e2
     | Unop(o, e) -> string_of_uop o ^ string_of_expr e
-    | Doubleliteral(l) -> l
+    | DoubleLiteral(l) -> l
     | StringLit(l) -> l
     | IntLit(l) -> string_of_int l
     | BoolLit(true) -> "true"   

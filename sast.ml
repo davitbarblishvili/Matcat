@@ -11,7 +11,7 @@ and sx =
     SIntLit of int
   | SBinop of sexpr * operator * sexpr
   | SUnop of unary_operator * sexpr
-  | SDoubleliteral of string
+  | SDoubleLiteral of string
   | SStringLit of string
   | SBoolLit of bool
   | SCharLit of char
@@ -48,7 +48,7 @@ let rec string_of_sexpr (t, e) =
     SBinop(e1, o, e2) ->
         string_of_sexpr e1 ^ " " ^ string_of_operator o ^ " " ^ string_of_sexpr e2
     | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e
-    | SDoubleliteral(l) -> l
+    | SDoubleLiteral(l) -> l
     | SStringLit(l) -> l
     | SIntLit(l) -> string_of_int l
     | SBoolLit(true) -> "true"
