@@ -1,8 +1,6 @@
-func main() bool
+func main() int
 {
     printStr("hello world");
-    return true;
-}
-
-
+    return 0;
    
+}

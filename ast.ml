@@ -13,10 +13,10 @@ type unary_operator = Not | Neg | Inverse | Transpose
 type data_type = Int | Char | Double | String | Void | Bool | Matrix | Vector
 
 type expr =
-  IntLit of int
+Literal of int
 | Binop of expr * operator * expr
 | Unop of unary_operator * expr
-| DoubleLiteral of string
+| Doubleliteral of string
 | StringLit of string
 | BoolLit of bool
 | CharLit of char
@@ -84,13 +84,12 @@ let string_of_data_type = function
 (* Pretty-printing functions *)
 
 let rec string_of_expr = function
-
-     Binop(e1, o, e2) ->
+    Literal(l) -> string_of_int l
+    | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_operator o ^ " " ^ string_of_expr e2
     | Unop(o, e) -> string_of_uop o ^ string_of_expr e
-    | DoubleLiteral(l) -> l
+    | Doubleliteral(l) -> l
     | StringLit(l) -> l
-    | IntLit(l) -> string_of_int l
     | BoolLit(true) -> "true"   
     | BoolLit(false) -> "false"
     | CharLit(l) -> "???"

@@ -17,7 +17,7 @@ scanner.ml : scanner.mll
 .PHONY : clean
 clean : 
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff *.err *.ll *.exe *.out *.s *.lli
+	rm -rf testall.log ocamlllvm *.diff *.err *.ll
 
 .PHONY : test
 test : testall.sh
