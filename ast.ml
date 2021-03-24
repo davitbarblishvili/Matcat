@@ -118,9 +118,11 @@ let string_of_vdecl (t, id) = string_of_data_type t ^ " " ^ id ^ ";\n"
 
 let string_of_fdecl fdecl =
   "func " ^
+  fdecl.fname ^
+  "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
+  ") " ^
   String.concat "" (List.map string_of_data_type fdecl.data_types) ^
-  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
-  ")\n{\n" ^
+  " {\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.locals) ^
   String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n"
@@ -128,3 +130,5 @@ let string_of_fdecl fdecl =
 let string_of_program (vars, funcs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)
+
+  
