@@ -70,7 +70,7 @@ let translate (globals, functions) =
       | SDoubleliteral l -> L.const_float_of_string double_t l
       | SStringLit s -> L.build_global_stringptr s "tmp" builder
       | SNoexpr     -> L.const_int i32_t 0
-      | SCall ("print", [e]) ->
+      | SCall ("print", [e]) -> 
 	      L.build_call printf_func [| int_format_str ; (expr builder e) |]
         "printf" builder      
 
