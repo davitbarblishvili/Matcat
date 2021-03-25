@@ -25,7 +25,7 @@ test : testall.sh
 
 # An excluding way to build the tarball
 # may not be a good idea, but let's try for a while
-EXCLUDEPATTERNS = .* *_build* MicroC
+EXCLUDEPATTERNS = .* *_build* MicroC *.log
 ECSTRING = $(EXCLUDEPATTERNS:%= --exclude="%" )
 tar : clean
 	echo ${ECSTRING}
