@@ -1,20 +1,21 @@
 # Matcat
 
-The Matcat language is an imperative, mathematically-inclined language whose goal is to
-aid in the writing and computation of linear algebra operations. The implementation of these
-functions will occur in similar ways to the Wolfram language (see
-https://reference.wolfram.com/language/guide/MatricesAndLinearAlgebra.html). Matcat aims to
-mimic functionality from Java and C.
+The Matcat language is an imperative, mathematically-inclined, and C-like language with syntactically supports for Linear Algebra.
 
-Our primary goals are: 
+## Usage
 
-● To simplify operations on matrices. Examples of these include row reduction, computing
-transformations, finding eigenvalues/eigenvectors, diagonalizing/transposing a matrix,
-performing the Gram-Schmidt process to find orthogonal bases, and others;
+To build the language, clone the repository and run:
 
-● To achieve Java-like syntax;
+```make matcat.native```
 
-● To allow users to write readable code; matrix/vector structures and the operators must
-mirror mathematical symbols and read intuitively;
+This will generate an executable called matcat.native, which acts as an interpreter for our language.
 
-● Compile time optimizations (static typing);
+(LLVM is required.)
+
+## Testing
+
+To run the automated test-suite, run:
+
+```make test```
+
+This will run all the existing test cases (tests/test-print.mc shows a hello world example).
