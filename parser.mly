@@ -10,7 +10,7 @@ open Ast
 %token RETURN IF ELSE FOR WHILE INT BOOL DOUBLE CHAR VOID
 /* added */
 %token CR DOT MATRIX VECTOR FUNC 
-%token <int> LITERAL
+%token <int> INTLIT
 %token <bool> BLIT
 %token <string> ID DOUBLELIT
 %token <string> STRINGLIT
@@ -107,7 +107,7 @@ expr_opt:
   | expr          { $1 }  
 
 expr:
-    LITERAL          { Literal($1)            }
+    INTLIT          { IntLit($1)            }
   | DOUBLELIT	       { Doubleliteral($1)      }
   | BLIT             { BoolLit($1)            }
   | STRINGLIT        { StringLit($1)          }
