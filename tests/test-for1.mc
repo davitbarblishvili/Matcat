@@ -2,7 +2,7 @@ func main() int
 {
   int i;
 
-  for (i = 0; 1 < 2 ; i = i + 1) {
+  for (i = 0; i < 1 ; i = i + 1) {
       print("Loop Success")
   } 
 
