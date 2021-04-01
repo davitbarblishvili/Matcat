@@ -3,7 +3,7 @@ func main() int
 
     while(2 != (2 * 1)) {}
 
-    print("pass")
+    printStr("pass");
 
     return 0;
 }

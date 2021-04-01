@@ -3,9 +3,7 @@ func main() int
 
     bool b = false;
 
-    while(b) {}
-
-    printStr("pass");
+    printb(b);
 
     return 0;
 }
