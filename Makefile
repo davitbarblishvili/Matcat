@@ -17,10 +17,10 @@ scanner.ml : scanner.mll
 .PHONY : clean
 clean : 
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff *.err *.ll *.lli *.exe *.out *.s
+	rm -rf testall.log ocamlllvm *.diff *.err *.ll *.lli *.exe *.out *.s matcat.native
 
 .PHONY : test
-test : testall.sh
+test : matcat.native
 	./testall.sh
 
 # An excluding way to build the tarball
