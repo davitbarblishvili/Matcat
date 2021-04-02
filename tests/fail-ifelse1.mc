@@ -3,7 +3,7 @@ func main() int
 
   bool b = true;
 
-  if(b) {
+  if(5) { // non bool
       printStr("goodprint");
   }
 

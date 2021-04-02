@@ -1,5 +1,5 @@
 func main() int
 {
-    printStr("hell)
+    printStr("hell) // malformed
     return 0;
 }
