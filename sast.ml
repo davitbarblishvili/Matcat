@@ -11,7 +11,7 @@ and sx =
     SIntLit of int
   | SBinop of sexpr * operator * sexpr
   | SUnop of unary_operator * sexpr
-  | SDoubleliteral of string
+  | SDoubleLit of string
   | SStringLit of string
   | SBoolLit of bool
   | SCharLit of char
@@ -20,6 +20,9 @@ and sx =
   | SAssign of string * sexpr
   | SCall of string * sexpr list
   | SNoexpr
+
+  type sbind = data_type * string * sexpr
+
 
 type sstmt =
     SBlock of sstmt list
@@ -32,7 +35,7 @@ type sstmt =
 type sfunc_decl = {
     sfname : string;
     sformals : bind list;
-	  sdata_types : data_type list;
+	  sdata_type : data_type list;
     slocals : bind list;
     sbody : sstmt list;
   }
@@ -48,7 +51,7 @@ let rec string_of_sexpr (t, e) =
     | SBinop(e1, o, e2) ->
         string_of_sexpr e1 ^ " " ^ string_of_operator o ^ " " ^ string_of_sexpr e2
     | SUnop(o, e) -> string_of_uop o ^ string_of_sexpr e
-    | SDoubleliteral(l) -> l
+    | SDoubleLit(l) -> l
     | SStringLit(l) -> l
     | SBoolLit(true) -> "true"
     | SBoolLit(false) -> "false"
@@ -76,7 +79,7 @@ let rec string_of_sstmt = function
 
 
 
-  let string_of_sfdecl fdecl =
+  (*let string_of_sfdecl fdecl =
     "func " ^
     fdecl.sfname ^ "(" ^ String.concat ", " (List.map snd fdecl.sformals) ^
     ") "^
@@ -84,7 +87,17 @@ let rec string_of_sstmt = function
     "{\n" ^
     String.concat "" (List.map string_of_vdecl fdecl.slocals) ^
     String.concat "" (List.map string_of_sstmt fdecl.sbody) ^
-    "}\n"
+    "}\n"*)
+
+    let string_of_sfdecl fdecl =
+      "func " ^
+      fdecl.sfname ^ "(" ^ String.concat ", " (List.map (fun (_, vName, _) -> vName) fdecl.sformals) ^
+      ")" ^ String.concat "" (List.map string_of_data_type fdecl.sdata_type) ^ "\n{\n" ^
+      String.concat "" (List.map string_of_vdecl fdecl.slocals) ^
+      String.concat "" (List.map string_of_sstmt fdecl.sbody) ^
+      "}\n"    
+
+  
   
 
 let string_of_sprogram (vars, funcs) =

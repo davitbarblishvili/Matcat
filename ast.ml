@@ -16,7 +16,7 @@ type expr =
   IntLit of int
 | Binop of expr * operator * expr
 | Unop of unary_operator * expr
-| Doubleliteral of string
+| DoubleLit of string
 | StringLit of string
 | BoolLit of bool
 | CharLit of char
@@ -26,7 +26,7 @@ type expr =
 | Call of string * expr list
 | Noexpr
 
-type bind = data_type * string
+type bind = data_type * string * expr
 
 type stmt =
   Block of stmt list
@@ -41,7 +41,7 @@ Also not sure where to include Funct keyword- I figured it out :) *)
 type func_decl = {
     fname : string;
     formals : bind list;
-	  data_types : data_type list;
+	  data_type : data_type list;
     locals : bind list;
     body : stmt list;
   }
@@ -88,7 +88,7 @@ let rec string_of_expr = function
     | Binop(e1, o, e2) ->
       string_of_expr e1 ^ " " ^ string_of_operator o ^ " " ^ string_of_expr e2
     | Unop(o, e) -> string_of_uop o ^ string_of_expr e
-    | Doubleliteral(l) -> l
+    | DoubleLit(l) -> l
     | StringLit(l) -> l
     | BoolLit(true) -> "true"   
     | BoolLit(false) -> "false"
@@ -114,17 +114,27 @@ let rec string_of_stmt = function
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
 
   (*variable declaration*)
-let string_of_vdecl (t, id) = string_of_data_type t ^ " " ^ id ^ ";\n"
+let string_of_vdecl (t, id,_) = string_of_data_type t ^ " " ^ id ^ ";\n"
 
-let string_of_fdecl fdecl =
+(*let string_of_fdecl fdecl =
   "func " ^
   fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
   ") "^
-  String.concat "" (List.map string_of_data_type fdecl.data_types) ^
+  String.concat "" (List.map string_of_data_type fdecl.data_type) ^
   "{\n" ^
   String.concat "" (List.map string_of_vdecl fdecl.locals) ^
   String.concat "" (List.map string_of_stmt fdecl.body) ^
-  "}\n"
+  "}\n" *)
+
+  let string_of_fdecl fdecl =
+    "func " ^
+    fdecl.fname ^ "(" ^ String.concat ", " (List.map (fun (_, vName, _) -> vName) fdecl.formals) ^
+    ")" ^ String.concat "" (List.map string_of_data_type fdecl.data_type) ^ "\n{\n" ^
+    String.concat "" (List.map string_of_vdecl fdecl.locals) ^
+    String.concat "" (List.map string_of_stmt fdecl.body) ^
+    "}\n"
+
+
 let string_of_program (vars, funcs) =
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
   String.concat "\n" (List.map string_of_fdecl funcs)

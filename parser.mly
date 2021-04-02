@@ -51,7 +51,7 @@ fdecl:
      { { 
 	 fname = $2;
 	 formals = List.rev $4;
-	 data_types = List.rev $6;
+	 data_type = List.rev $6;
 	 locals = List.rev $8;
 	 body = List.rev $9 } }
 formals_opt:
@@ -59,8 +59,8 @@ formals_opt:
   | formal_list   { $1 }
 
 formal_list:
-    typ ID                   { [($1,$2)]     }
-  | formal_list COMMA typ ID { ($3,$4) :: $1 }
+    typ ID                   { [($1,$2,Noexpr)]     }
+  | formal_list COMMA typ ID { ($3,$4,Noexpr) :: $1 }
 
 /* func sumAndDiff(int one, int two) int, int { */
 /* This is for the part that function can return more than one type */
@@ -86,7 +86,8 @@ vdecl_list:
   | vdecl_list vdecl { $2 :: $1 }
 
 vdecl:
-   typ ID SEMI { ($1, $2) }
+   typ ID SEMI { ($1, $2, Noexpr) }
+  |typ ID ASSIGN expr SEMI { ($1, $2, Assign($2,$4))}
 
 stmt_list:
     /* nothing */  { [] }
@@ -109,7 +110,7 @@ expr_opt:
 
 expr:
     INTLIT          { IntLit($1)            }
-  | DOUBLELIT	       { Doubleliteral($1)      }
+  | DOUBLELIT	       { DoubleLit($1)      }
   | BLIT             { BoolLit($1)            }
   | STRINGLIT        { StringLit($1)          }
   | CHARLIT          { CharLit($1)            }

@@ -46,9 +46,9 @@ let translate (globals, functions) =
     let function_decl m fdecl =
       let name = fdecl.sfname
       and formal_types = 
-	Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
+	Array.of_list (List.map (fun (t,_,_) -> ltype_of_typ t) fdecl.sformals)
       (* Returning mutiple values  *)
-      in let ftype = L.function_type (ltype_of_typ (List.hd fdecl.sdata_types)) formal_types in
+      in let ftype = L.function_type (ltype_of_typ (List.hd fdecl.sdata_type)) formal_types in
       StringMap.add name (L.define_function name ftype the_module, fdecl) m in
     List.fold_left function_decl StringMap.empty functions in
   
@@ -67,7 +67,7 @@ let translate (globals, functions) =
     let rec expr builder ((_, e) : sexpr) = match e with
 	SIntLit i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
-      | SDoubleliteral l -> L.const_float_of_string double_t l
+      | SDoubleLit l -> L.const_float_of_string double_t l
       | SStringLit s -> L.build_global_stringptr s "tmp" builder
       | SNoexpr     -> L.const_int i32_t 0
       | SCall ("print", [e]) -> 
@@ -85,7 +85,7 @@ let translate (globals, functions) =
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	    let llargs = List.rev (List.map (expr builder) (List.rev args)) in
-	    let result = (match (List.hd fdecl.sdata_types) with (* TODO: figure out how to return more than 1 value *)
+	    let result = (match (List.hd fdecl.sdata_type) with (* TODO: figure out how to return more than 1 value *)
                         A.Void -> ""
                       | _ -> f ^ "_result") in
       L.build_call fdef (Array.of_list llargs) result builder
@@ -102,7 +102,7 @@ let translate (globals, functions) =
     let rec stmt builder = function
 	SBlock sl -> List.fold_left stmt builder sl
       | SExpr e -> ignore(expr builder e); builder 
-      | SReturn e -> ignore(match (List.hd fdecl.sdata_types) with
+      | SReturn e -> ignore(match (List.hd fdecl.sdata_type) with
                               (* Special "return nothing" instr *)
                               A.Void -> L.build_ret_void builder 
                               (* Build return statement *)
@@ -148,7 +148,7 @@ let translate (globals, functions) =
     let builder = stmt builder (SBlock fdecl.sbody) in
 
     (* Add a return if the last block falls off the end *)
-    add_terminal builder (match (List.hd fdecl.sdata_types) with
+    add_terminal builder (match (List.hd fdecl.sdata_type) with
         A.Void -> L.build_ret_void
       | A.Double -> L.build_ret (L.const_float double_t 0.0)
       | t -> L.build_ret (L.const_int (ltype_of_typ t) 0))
