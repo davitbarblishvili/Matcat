@@ -173,13 +173,10 @@ module StringMap = Map.Make(String)
           SFor(expr e1, check_bool_expr e2, expr e3, check_stmt st)
         | While(p, s) -> SWhile(check_bool_expr p, check_stmt s)
         | Return e -> let (t, e') = expr e in
-          (* if t = func.typ then SReturn (t, e')  *)
-          if true then SReturn (t, e') 
-          else raise (
-      (* Failure ("return gives " ^ string_of_data_type t ^ " expected " ^
-         string_of_data_type func.typ ^ " in " ^ string_of_expr e) *)
-         Failure ("Return gives.... bad things")      (*TODO: rewrite this...  figure out how func.typ works *)
-         )
+        if t = List.hd func.data_type then SReturn (t, e') 
+        else raise (
+	      Failure ("return gives " ^ string_of_data_type t ^ " expected " ^
+		   string_of_data_type (List.hd func.data_type) ^ " in " ^ string_of_expr e))
         
         (* A block is correct if each statement is correct and nothing
            follows any Return statement.  Nested blocks are flattened. *)
