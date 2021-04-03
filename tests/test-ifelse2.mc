@@ -2,6 +2,8 @@ func main() int
 {
 
   bool b = true;
+  printb(b);
+  printb(true);
 
   if(b) {
       printStr("goodprint");
@@ -10,6 +12,8 @@ func main() int
   if(!b) {
       printStr("badprint");
   }
+
+  printb(b);
 
   return 0;
 }

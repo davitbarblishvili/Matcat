@@ -47,7 +47,7 @@ module StringMap = Map.Make(String)
         in create_ty_list ty);
         locals = []; body = [] } map
       in List.fold_left add_bind StringMap.empty [ ("print", [Int],Void);
-                                 ("printb", [Bool],Int);
+                                 ("printb", [Bool],Void);
                                  ("printd", [Double],Void);
                                  ("printStr", [String],Void) ]
     in
