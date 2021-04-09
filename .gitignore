@@ -1,0 +1,26 @@
+*.a
+*.annot
+*.cma
+*.cmi
+*.cmo
+*.cmx
+*.cmxa
+*.cmxs
+*.o
+
+# MacOS related
+.DS_Store
+
+_build
+
+# We should be delete these files. Ignore for now.
+MicroC
+# We have a README to show the "overview"
+overview.txt    
+
+scanner.ml
+*.diff
+*.log
+*.native
+*.out
+*.tar.gz
