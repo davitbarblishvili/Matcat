@@ -1,7 +1,8 @@
 func main() int
 {
 
-  bool b = true;
+  bool b; 
+  b = true;
 
   if(b) {
       printStr("hm");
