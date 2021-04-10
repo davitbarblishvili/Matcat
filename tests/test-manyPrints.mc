@@ -1,9 +1,8 @@
 func main() int
 {
     printStr("hello world");
-    string s;
-    s = " with more words";
-    printStr(s)
+
+    printStr("with more words");
     return 0;
    
 }
