@@ -20,13 +20,34 @@ basename=`echo $1 | sed 's/.*\\///
 reffile=`echo $1 | sed 's/.mc$//'`
 basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
+# lastSeen=""
+
+Check() {
+    if [ $? -ne 0 ]; then
+        if [[ "$basename" == *"test-"* ]]; then
+            echo "FAILED"
+            exit 1
+        fi
+        if [[ "$basename" == *"fail"* ]]; then
+            echo "Failed but that was the plan"
+            exit 1
+        fi
+    fi
+}
+
+
 echo "$MATCAT $1 > $basename.ll"
 $MATCAT $1 > $basename.ll
+Check
 
 echo "llc -relocation-model=pic $basename.ll > $basename.s"
 llc -relocation-model=pic $basename.ll > $basename.s
+Check
 
 echo "cc -o $basename.exe $basename.s"
 cc -o $basename.exe $basename.s
+Check
+
 
 ./$basename.exe
+Check
