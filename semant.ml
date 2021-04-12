@@ -14,19 +14,18 @@ module StringMap = Map.Make(String)
 
    Check each global variable, then check each function *)
 
-   let check (globals, functions) =
-
+let check (globals, functions) =
     (* Verify a list of bindings has no void types or duplicate names *)
     let check_binds (kind : string) (binds : bind list) =
       List.iter (function
-    (Void, b,_) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
+    (Void, b) -> raise (Failure ("illegal void " ^ kind ^ " " ^ b))
         | _ -> ()) binds;
       let rec dups = function
           [] -> ()
-        |	((_,n1,_) :: (_,n2,_) :: _) when n1 = n2 ->
+        |	((_,n1) :: (_,n2) :: _) when n1 = n2 ->
       raise (Failure ("duplicate " ^ kind ^ " " ^ n1))
         | _ :: t -> dups t
-      in dups (List.sort (fun (_,a,_) (_,b,_) -> compare a b) binds)
+      in dups (List.sort (fun (_,a) (_,b) -> compare a b) binds)
     in
   
     (**** Check global variables ****)
@@ -37,19 +36,17 @@ module StringMap = Map.Make(String)
   
     (* Collect function declarations for built-in functions: no bodies *)
     let built_in_decls = 
-      let add_bind map (name, ty,ret) = StringMap.add name {
-        data_type = [Void;Void];
+      let add_bind map (name, ty) = StringMap.add name {
         fname = name; 
-        formals =
-      (let rec create_ty_list = (function
-        [] -> []
-        | hd::tl -> (hd, "x", Noexpr)::(create_ty_list tl))
-        in create_ty_list ty);
-        locals = []; body = [] } map
-      in List.fold_left add_bind StringMap.empty [ ("print", [Int],Void);
-                                 ("printb", [Bool],Void);
-                                 ("printd", [Double],Void);
-                                 ("printStr", [String],Void) ]
+        formals = [(ty, "x")];
+        data_type = Void;
+        locals = [];
+        body = [] } map
+      in List.fold_left add_bind StringMap.empty [
+        ("print", Int);
+        ("printb", Bool);
+        ("printd", Double);
+        ("printStr",String) ]
     in
   
     (* Add function name to symbol table *)
@@ -88,7 +85,7 @@ module StringMap = Map.Make(String)
       in   
   
       (* Build local symbol table of variables for this function *)
-      let symbols = List.fold_left (fun m (ty, name,_) -> StringMap.add name ty m)
+      let symbols = List.fold_left (fun m (ty, name) -> StringMap.add name ty m)
                     StringMap.empty (globals @ func.formals @ func.locals )
       in
   
@@ -154,9 +151,9 @@ module StringMap = Map.Make(String)
               in (check_assign ft et err, e')
             in 
 
-           let fdFormals = List.map (fun (tp, vName, _) -> (tp, vName) ) fd.formals in
+           let fdFormals = List.map (fun (tp, vName) -> (tp, vName) ) fd.formals in
           let args' = List.map2 check_call fdFormals args
-          in (List.hd fd.data_type, SCall(fname, args'))
+          in (fd.data_type, SCall(fname, args'))
       in
   
       let check_bool_expr e = 
@@ -173,10 +170,10 @@ module StringMap = Map.Make(String)
           SFor(expr e1, check_bool_expr e2, expr e3, check_stmt st)
         | While(p, s) -> SWhile(check_bool_expr p, check_stmt s)
         | Return e -> let (t, e') = expr e in
-        if t = List.hd func.data_type then SReturn (t, e') 
+        if t = func.data_type then SReturn (t, e') 
         else raise (
 	      Failure ("return gives " ^ string_of_data_type t ^ " expected " ^
-		   string_of_data_type (List.hd func.data_type) ^ " in " ^ string_of_expr e))
+		   string_of_data_type (func.data_type) ^ " in " ^ string_of_expr e))
         
         (* A block is correct if each statement is correct and nothing
            follows any Return statement.  Nested blocks are flattened. *)
