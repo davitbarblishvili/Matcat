@@ -10,7 +10,7 @@ matrixLibrary : matrixLibrary.c
 	cc -o matrixLibrary -DBUILD_TEST matrixLibrary.c
 
 matrixLibrary.bc : matrixLibrary.c
-	gcc -emit-llvm -o matrixLibrary.bc -c matrixLibrary.c -Wno-varargs
+	clang -emit-llvm -o matrixLibrary.bc -c matrixLibrary.c -Wno-varargs
 
 %.cmo : %.ml
 	ocamlc -c $<
