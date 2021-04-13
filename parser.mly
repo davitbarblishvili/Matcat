@@ -141,7 +141,7 @@ expr:
   | expr CR expr     { Binop($1,Cr,$3)        }
   | expr DOT expr    { Binop($1,Dot,$3)       }
   // | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
-  // | LT matrix_value SEMI GT         { MatrixLit($2)}
+   | LBRACK matrix_value RBRACK        { MatrixLit($2)}
   // | ID LBRACK expr RBRACK { VectorElmFromID($1,$3)}
   // | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElmFromID($1,$3,$6)}
   // | LBRACK vector_value SEMI RBRACK LBRACK expr RBRACK { VectorElm($2,$6)}
@@ -154,20 +154,13 @@ args_opt:
     /* nothing */ { [] }
   | args_list  { List.rev $1 }
 
-args_opt_vector:
-    { [] }
-  | args_list_vector  { List.rev $1 }
-
-args_list_vector:
-    expr       { [$1] }
   
 args_list:
     expr                    { [$1] }
   | args_list COMMA expr    { $3 :: $1 }
 
 matrix_value:
-   args_opt                   { [$1] }
- | matrix_value SEMI args_opt {$3 :: $1}
+  LBRACK args_opt RBRACK                   { [MatrixLit(List.rev $2)] }
+| LBRACK args_opt RBRACK COMMA matrix_value { MatrixLit(List.rev $2)::$5 }
+| LBRACK args_opt RBRACK matrix_value       { MatrixLit(List.rev $2)::$4 }
 
-vector_value:
- args_opt_vector     {[$1]}

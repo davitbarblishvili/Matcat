@@ -20,7 +20,7 @@ type expr =
 | StringLit of string
 | BoolLit of bool
 | CharLit of char
-| MatrixLit of float array array
+| MatrixLit of expr list
 | Id of string
 | Assign of string * expr
 | Call of string * expr list
@@ -93,7 +93,7 @@ let rec string_of_expr = function
     | BoolLit(true) -> "true"   
     | BoolLit(false) -> "false"
     | CharLit(l) -> "???"
-    | MatrixLit(l) -> "???"
+    | MatrixLit(l) ->  "matrixLit[" ^ String.concat ", " (List.map string_of_expr l) ^ "]"
     | Id(s) -> s
     | Assign(v, e) -> v ^ " = " ^ string_of_expr e
     | Call(f, el) ->

@@ -10,6 +10,9 @@ module StringMap = Map.Make(String)
 (* translate : Sast.program -> Llvm.module *)
 let translate (globals, functions) =
   let context    = L.global_context () in
+  let llmem = L.MemoryBuffer.of_file "matrixLibrary.bc" in
+  let llm = Llvm_bitreader.parse_bitcode context llmem in
+
 
   (* Create the LLVM compilation module into which
      we will generate code *)
@@ -21,8 +24,10 @@ let translate (globals, functions) =
   and i1_t       = L.i1_type     context
   and double_t    = L.double_type context
   and void_t     = L.void_type   context
-  and array_t m n = (L.array_type (L.array_type (L.double_type context) n) m) in
-
+  and matrx_t    = L.pointer_type (match L.type_by_name llm "struct.matrix" with
+      None -> raise (Failure "Missing implementation for struct Matrix")
+    | Some t -> t)
+  in
   (* Return the LLVM type for a MicroC type *)
   let ltype_of_typ = function
     | A.String -> L.pointer_type (L.array_type i8_t 100)
@@ -30,7 +35,7 @@ let translate (globals, functions) =
     | A.Int   -> i32_t
     | A.Bool  -> i1_t
     | A.Double -> double_t
-    | A.Matrix -> L.pointer_type (array_t 10 10)
+    | A.Matrix -> matrx_t
   in
 
   let global_vars : L.llvalue StringMap.t =
@@ -45,6 +50,14 @@ let translate (globals, functions) =
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
   let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
+
+
+      let printMatrix_t = L.function_type i32_t [| matrx_t |] in
+      let printMatrix_f = L.declare_function "printMatrix" printMatrix_t the_module in
+      let matrix_init_t = L.function_type matrx_t [|i32_t ; i32_t|] in
+      let matrix_init_f = L.declare_function "initMatrix_helper" matrix_init_t the_module in
+      let store_matrix_t = L.function_type matrx_t [|matrx_t ; i32_t |] in
+      let store_matrix_f = L.declare_function "storeEntries" store_matrix_t the_module in
 
   let matrix_size = Hashtbl.create 12 in
 
@@ -102,6 +115,16 @@ let translate (globals, functions) =
       | SDoubleLit l -> L.const_float_of_string double_t l
       | SStringLit s -> L.build_global_stringptr s "tmp" builder
       | SId s       -> L.build_load (lookup s) s builder
+      | SMatrixLit (contents, rows, cols) ->
+      let rec expr_list = function
+        [] -> []
+        | hd::tl -> expr builder hd::expr_list tl
+      in
+      let contents' = expr_list contents
+      in
+      let m = L.build_call matrix_init_f [| L.const_int i32_t cols; L.const_int i32_t rows |] "matrix_init" builder
+      in
+      ignore(List.map (fun v -> L.build_call store_matrix_f [| m ; v |] "store_val" builder) contents'); m
       | SNoexpr     -> L.const_int i32_t 0
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
@@ -140,7 +163,9 @@ let translate (globals, functions) =
         L.build_call printf_func [| float_format_str ; (expr builder e) |]
         "printf" builder
 
-      
+      | SCall ("printm", [e]) ->
+        L.build_call printMatrix_f [| (expr builder e) |] "printm" builder
+
       | SCall (f, args) ->
          let (fdef, fdecl) = StringMap.find f function_decls in
 	    let llargs = List.rev (List.map (expr builder) (List.rev args)) in

@@ -49,6 +49,7 @@ module StringMap = Map.Make(String)
       in List.fold_left add_bind StringMap.empty [ ("print", [Int],Void);
                                  ("printb", [Bool],Void);
                                  ("printd", [Double],Void);
+                                 ("printm", [Matrix],Void);
                                  ("printStr", [String],Void) ]
     in
   
@@ -86,6 +87,17 @@ module StringMap = Map.Make(String)
       let check_assign lvaluet rvaluet err =
          if lvaluet = rvaluet then lvaluet else raise (Failure err)
       in   
+
+      let rec get_dims = function
+      MatrixLit l -> List.length l :: get_dims (List.hd l)
+    | _ -> []
+      in
+
+      let rec flatten d = function
+      [] -> []
+      | MatrixLit hd::tl -> if List.length hd != List.hd d then raise (Failure("Invalid dims")) else List.append (flatten (List.tl d) hd) (flatten d tl)
+      | a -> a
+      in
   
       (* Build local symbol table of variables for this function *)
       let symbols = List.fold_left (fun m (ty, name,_) -> StringMap.add name ty m)
@@ -106,7 +118,20 @@ module StringMap = Map.Make(String)
         | Noexpr     -> (Void, SNoexpr)
         | CharLit l ->(Char, SCharLit l)        (* TODO: review *)
         | StringLit l ->(String, SStringLit l)  (* TODO: review *)
-        | MatrixLit l ->(String, SMatrixLit l)  (* TODO: review *)
+        | MatrixLit l -> 
+          let d = get_dims (MatrixLit l) in
+          let rec all_match = function
+            [] -> ignore()
+            | hd::tl -> if tl != [] then
+                          let (t1, _) = expr hd in let (t2, _) = expr (List.hd tl) in
+                          if t1 = t2 then all_match tl else raise (Failure ("Data Mismatch in MatrixLit: " ^ string_of_data_type t1 ^ " does not match " ^ string_of_data_type t2))
+                        else ignore()
+          in
+          all_match l;
+          if List.length d > 2 then (Matrix, SMatrixLit ((List.map expr l), List.hd d, List.hd (List.tl d)))
+          else if List.length d = 2 then (Matrix, SMatrixLit ( (List.map expr (flatten (List.tl d) l)), List.hd d, List.hd (List.tl d)))
+          else if List.length d = 1 then (Matrix, SMatrixLit ( (List.map expr (flatten (List.tl d) l)), List.hd d, 1))
+          else (Matrix, SMatrixLit ( (List.map expr l), 0,0))
         | Id s       -> (type_of_identifier s, SId s)
         | Assign(var, e) as ex -> 
             let lt = type_of_identifier var

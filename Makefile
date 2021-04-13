@@ -1,6 +1,16 @@
-matcat.native :
+
+.PHONY : all
+all : matcat.native matrixLibrary.o
+
+matcat.native : matrixLibrary.bc
 	opam config exec -- \
-	ocamlbuild -use-ocamlfind matcat.native
+	ocamlbuild -use-ocamlfind matcat.native -pkgs llvm,llvm.analysis,llvm.bitreader
+
+matrixLibrary : matrixLibrary.c
+	cc -o matrixLibrary -DBUILD_TEST matrixLibrary.c
+
+matrixLibrary.bc : matrixLibrary.c
+	gcc -emit-llvm -o matrixLibrary.bc -c matrixLibrary.c -Wno-varargs
 
 %.cmo : %.ml
 	ocamlc -c $<
@@ -17,7 +27,7 @@ scanner.ml : scanner.mll
 .PHONY : clean
 clean : 
 	ocamlbuild -clean
-	rm -rf testall.log ocamlllvm *.diff *.err *.ll *.lli *.exe *.out *.s matcat.native
+	rm -rf testall.log ocamlllvm *.diff *.err *.ll *.lli *.exe *.out *.s matcat.native *.mc *.o *.bc
 
 .PHONY : test
 test : matcat.native
@@ -30,3 +40,4 @@ ECSTRING = $(EXCLUDEPATTERNS:%= --exclude="%" )
 tar : clean
 	echo ${ECSTRING}
 	cd .. && tar ${ECSTRING} -cvf matcat/matcat.tar.gz matcat
+
