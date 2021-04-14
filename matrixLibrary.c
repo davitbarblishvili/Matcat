@@ -84,3 +84,35 @@ matrix* storeEntries(matrix* target, int value) {
     return target;
 }
 
+#ifdef BUILD_TEST
+int main(int argc,char** argv) {
+  //run tests of each function
+  //initMatrix and display of empty matrix
+  matrix *null_matrix=initMatrix(NULL, 2, 2);
+  printf("NULL MATRIX: \n");
+  display(null_matrix);
+
+  
+
+
+  //initMatrix and display of 2x2 matrix
+  int vals1[] = {3, 8, 4, 6};
+  int *list1 = vals1;
+  matrix *m = initMatrix(list1, 2, 2);
+  printf("2x2 MATRIX: \n");
+  display(m);
+
+  //TODO test codegen builder
+  for( int i = 0; i < 4; i++) {
+      m = storeEntries(m, 5);
+      printf("Stroring 5: \n");
+      printMatrix(m);
+  }
+  
+
+}
+#endif
+
+
+
+

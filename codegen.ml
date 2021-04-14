@@ -54,12 +54,13 @@ let translate (globals, functions) =
 
       let printMatrix_t = L.function_type i32_t [| matrx_t |] in
       let printMatrix_f = L.declare_function "printMatrix" printMatrix_t the_module in
+
       let matrix_init_t = L.function_type matrx_t [|i32_t ; i32_t|] in
       let matrix_init_f = L.declare_function "initMatrix_helper" matrix_init_t the_module in
+
       let store_matrix_t = L.function_type matrx_t [|matrx_t ; i32_t |] in
       let store_matrix_f = L.declare_function "storeEntries" store_matrix_t the_module in
 
-  let matrix_size = Hashtbl.create 12 in
 
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
