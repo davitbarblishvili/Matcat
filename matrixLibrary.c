@@ -16,7 +16,7 @@ void printMatrix(matrix* input) {
     int row = input->num_rows;
     int col = input->num_cols;
     for(int i = 0; i<row; i++) {
-        for(int j=0; j<col; j++) {
+        for(int j=col-1; j>=0; j--) {
             printf(" %d", input->matrixAddr[i][j]);
         }
         printf("\n");
