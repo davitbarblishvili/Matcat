@@ -55,7 +55,7 @@ let rec string_of_sexpr (t, e) =
     | SStringLit(l) -> l
     | SBoolLit(true) -> "true"
     | SBoolLit(false) -> "false"
-    | SCharLit(l) -> "???"
+    | SCharLit(l) -> Char.escaped l
     | SMatrixLit(l, r, c) -> "rows: " ^ string_of_int r ^ ", cols: " ^ 
                   string_of_int c ^ " : [" ^ String.concat ", " (List.map string_of_sexpr l) ^ "]"
     | SId(s) -> s

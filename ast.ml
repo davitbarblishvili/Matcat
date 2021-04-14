@@ -92,7 +92,7 @@ let rec string_of_expr = function
     | StringLit(l) -> l
     | BoolLit(true) -> "true"   
     | BoolLit(false) -> "false"
-    | CharLit(l) -> "???"
+    | CharLit(l) -> Char.escaped l
     | MatrixLit(l) ->  "matrixLit[" ^ String.concat ", " (List.map string_of_expr l) ^ "]"
     | Id(s) -> s
     | Assign(v, e) -> v ^ " = " ^ string_of_expr e

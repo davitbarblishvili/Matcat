@@ -2,25 +2,22 @@ func main() int
 {
 
     bool b1; 
-    b1 = false
-
     bool b2; 
-    b2 = true;
-
-    bool r;
-    neq = b1 != b2 
-    printb(neq); // 1
-
+    bool r; 
     int a;
-    a = 1;
-
     int b;
+    bool geq; 
+    bool neq; 
+    bool lt;  
+    
+
+    b1 = false;
+    b2 = true;
+    neq = b1 != b2;
+    printb(neq); // 1
+    a = 1;
     b = 0;
-
-    int geq;
     geq = a >= b;
-
-    int lt;
     lt = a < b;
 
     printb(geq); // 1

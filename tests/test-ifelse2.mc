@@ -1,9 +1,9 @@
 func main() int
 {
 
-  bool b = true;
-  printb(b);
-  printb(true);
+  bool b;
+  b = true;
+ 
 
   if(b) {
       printStr("goodprint");
@@ -13,7 +13,6 @@ func main() int
       printStr("badprint");
   }
 
-  printb(b);
 
   return 0;
 }

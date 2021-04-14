@@ -113,6 +113,7 @@ let translate (globals, functions) =
 	      SIntLit i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SDoubleLit l -> L.const_float_of_string double_t l
+      | SCharLit l  -> L.const_int i8_t (int_of_char l)
       | SStringLit s -> L.build_global_stringptr s "tmp" builder
       | SId s       -> L.build_load (lookup s) s builder
       | SMatrixLit (contents, rows, cols) ->
@@ -228,6 +229,8 @@ let translate (globals, functions) =
          let merge_bb = L.append_block context "merge" the_function in
          ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
          (L.builder_at_end context merge_bb, m)
+
+         
      
            (* Implement for loops as while loops *)
            | SFor (e1, e2, e3, body) -> stmt builder m
