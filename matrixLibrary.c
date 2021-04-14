@@ -15,12 +15,20 @@ int debug = 0;
 void printMatrix(matrix* input) {
     int row = input->num_rows;
     int col = input->num_cols;
+    printf("(");
+    printf("\n");
     for(int i = 0; i<row; i++) {
+       printf("[");
+        
         for(int j=col-1; j>=0; j--) {
-            printf(" %d", input->matrixAddr[i][j]);
+         
+            printf("%d ", input->matrixAddr[i][j]);
         }
+        printf("]");
         printf("\n");
     }
+    printf(")");
+
 }
 
 matrix* initMatrix(int* listOfValues, int num_cols, int num_rows) {
