@@ -61,6 +61,9 @@ let translate (globals, functions) =
       let store_matrix_t = L.function_type matrx_t [|matrx_t ; i32_t |] in
       let store_matrix_f = L.declare_function "storeEntries" store_matrix_t the_module in
 
+      let add_matrix_t = L.function_type matrx_t [|matrx_t; matrx_t|] in
+      let add_matrix_f = L.declare_function "matrxAdd" add_matrix_t the_module in
+
 
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
@@ -110,6 +113,13 @@ let translate (globals, functions) =
     with Not_found -> StringMap.find n global_vars
     in
 
+    let is_matrix ptr = 
+      let ltype_string = L.string_of_lltype (L.type_of ptr) in
+      match ltype_string with
+        "%matrix_t*" -> true
+      | _ -> false
+    in
+
     let rec expr builder ((_, e) : sexpr) = match e with
 	      SIntLit i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
@@ -118,19 +128,27 @@ let translate (globals, functions) =
       | SStringLit s -> L.build_global_stringptr s "tmp" builder
       | SId s       -> L.build_load (lookup s) s builder
       | SMatrixLit (contents, rows, cols) ->
-      let rec expr_list = function
-        [] -> []
-        | hd::tl -> expr builder hd::expr_list tl
-      in
-      let contents' = expr_list contents
-      in
-      let m = L.build_call matrix_init_f [| L.const_int i32_t cols; L.const_int i32_t rows |] "matrix_init" builder
-      in
-      ignore(List.map (fun v -> L.build_call store_matrix_f [| m ; v |] "store_val" builder) contents'); m
+        let rec expr_list = function
+          [] -> []
+          | hd::tl -> expr builder hd::expr_list tl
+        in
+        let contents' = expr_list contents
+        in
+        let m = L.build_call matrix_init_f [| L.const_int i32_t cols; L.const_int i32_t rows |] "matrix_init" builder
+        in
+        ignore(List.map (fun v -> L.build_call store_matrix_f [| m ; v |] "store_val" builder) contents'); m
       | SNoexpr     -> L.const_int i32_t 0
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop (e1, op, e2) ->
+       (let c1 = expr builder e1 in
+        let c2 = expr builder e2 in
+
+        let check1 = is_matrix c1 in
+        let check2 = is_matrix c2 in
+        match (check1,check2) with
+        | (false,false) ->
+
 	      let e1' = expr builder e1
 	      and e2' = expr builder e2 in
         (match op with
@@ -146,30 +164,54 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_icmp L.Icmp.Sle
         | A.Greater -> L.build_icmp L.Icmp.Sgt
         | A.Geq     -> L.build_icmp L.Icmp.Sge
-	  ) e1' e2' "tmp" builder
-      | SUnop(op, ((t, _) as e)) ->
+	      ) e1' e2' "tmp" builder
+        | _ -> 
+         let e1' = expr builder e1
+	      and e2' = expr builder e2 in
+        (match op with
+          A.Add     -> L.build_add
+        | A.Sub     -> L.build_sub
+        | A.Mult    -> L.build_mul
+        | A.Div     -> L.build_sdiv
+        | A.And     -> L.build_and
+        | A.Or      -> L.build_or
+        | A.Equal   -> L.build_icmp L.Icmp.Eq
+        | A.Neq     -> L.build_icmp L.Icmp.Ne
+        | A.Less    -> L.build_icmp L.Icmp.Slt
+        | A.Leq     -> L.build_icmp L.Icmp.Sle
+        | A.Greater -> L.build_icmp L.Icmp.Sgt
+        | A.Geq     -> L.build_icmp L.Icmp.Sge
+	      ) e1' e2' "tmp" builder
+        | (true,true) ->
+          let e1' = expr builder e1 and e2' = expr builder e2 in
+          (match op with
+              A.Add -> L.build_call add_matrix_f [| (expr builder e1); (expr builder e2) |] "matrxAdd" builder
+            | A.Sub -> L.build_call add_matrix_f [| (expr builder e1); (expr builder e2) |] "matrxAdd" builder
+          )
+        )
+        | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder e in
-	  (match op with
-	    A.Neg when t = A.Double -> L.build_fneg
-	  | A.Neg                  -> L.build_neg
-          | A.Not                  -> L.build_not) e' "tmp" builder
-      | SCall ("print", [e]) | SCall ("printb", [e]) ->
-	      L.build_call printf_func [| int_format_str ; (expr builder e) |] 
-        "printf" builder    
+	        (match op with
+	        A.Neg when t = A.Double -> L.build_fneg
+	      | A.Neg                  -> L.build_neg
+        | A.Not                  -> L.build_not) e' "tmp" builder
+        | SCall ("print", [e]) | SCall ("printb", [e]) ->
+          L.build_call printf_func [| int_format_str ; (expr builder e) |] 
+          "printf" builder    
 
-      | SCall ("printStr", [e]) ->
-        L.build_call printf_func [| string_format_str ; (expr builder e) |]
-        "printf" builder
+        | SCall ("printStr", [e]) ->
+          L.build_call printf_func [| string_format_str ; (expr builder e) |]
+          "printf" builder
 
-      | SCall ("printd",[e]) ->
-        L.build_call printf_func [| float_format_str ; (expr builder e) |]
-        "printf" builder
+        | SCall ("printd",[e]) ->
+          L.build_call printf_func [| float_format_str ; (expr builder e) |]
+          "printf" builder
 
-      | SCall ("printm", [e]) ->
-        L.build_call printMatrix_f [| (expr builder e) |] "printm" builder
+        | SCall ("printm", [e]) ->
+          L.build_call printMatrix_f [| (expr builder e) |] "printm" builder
 
-      | SCall (f, args) ->
-         let (fdef, fdecl) = StringMap.find f function_decls in
+        | SCall (f, args) ->
+          let (fdef, fdecl) = StringMap.find f function_decls in
 	    let llargs = List.rev (List.map (expr builder) (List.rev args)) in
 	    let result = (match (List.hd fdecl.sdata_type) with (* TODO: figure out how to return more than 1 value *)
                         A.Void -> ""
@@ -178,7 +220,7 @@ let translate (globals, functions) =
     in
     let add_terminal builder instr =
       match L.block_terminator (L.insertion_block builder) with
-	Some _ -> ()
+	      Some _ -> ()
       | None -> ignore (instr builder) in
 	
     (* Build the code for the given statement; return the builder for

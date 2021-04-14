@@ -50,7 +50,8 @@ module StringMap = Map.Make(String)
                                  ("printb", [Bool],Void);
                                  ("printd", [Double],Void);
                                  ("printm", [Matrix],Void);
-                                 ("printStr", [String],Void) ]
+                                 ("printStr", [String],Void);
+                                 ("matrxAdd", [Matrix; Matrix], Matrix) ]
     in
   
     (* Add function name to symbol table *)
@@ -161,6 +162,7 @@ module StringMap = Map.Make(String)
             | Less | Leq | Greater | Geq
                        when same && (t1 = Int || t1 = Double) -> Bool
             | And | Or when same && t1 = Bool -> Bool
+            | Add | Sub when same && t1 = Matrix -> Matrix
             | _ -> raise (
           Failure ("illegal binary operator " ^
                          string_of_data_type t1 ^ " " ^ string_of_operator op ^ " " ^

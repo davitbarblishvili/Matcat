@@ -2,6 +2,13 @@
 #include <stdio.h>
 #include <string.h>
 
+
+static void die(const char *message)
+{
+    perror(message);
+    exit(1);
+}
+
 struct matrix {
   int num_rows;
   int num_cols;
@@ -90,6 +97,24 @@ matrix* storeEntries(matrix* target, int value) {
     target->matrixAddr [curr_row][curr_col] = value;
     target->buildPosition = target->buildPosition + 1;
     return target;
+}
+
+matrix* matrxAdd(matrix* lhs, matrix* rhs) {
+  //check dimensions
+  if (lhs->num_rows != rhs->num_rows || lhs->num_cols != rhs->num_rows) {
+    die("matrix add size mismatch");
+  }
+  int rows = lhs->num_rows;
+  int cols= lhs->num_cols;
+  matrix *result = initMatrix(NULL, rows, cols);
+  for(int i=0; i<rows; i++) {
+    for(int j=0; j<cols; j++) {
+        int sum = lhs->matrixAddr[i][j] + rhs->matrixAddr[i][j];
+        result->matrixAddr[i][j] = sum;
+    }
+  }
+
+  return result;
 }
 
 #ifdef BUILD_TEST
