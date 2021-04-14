@@ -128,15 +128,21 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3)   }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
+/*
   | TRANSPOSE expr   { Unop(Transpose, $2)    }
   | INVERSE expr     { Unop(Inverse, $2)      }
+*/
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
   /* added */
   /* | LBRACK args_opt RBRACK              {SeqLit($2)} */
+
+/*
   | expr CR expr     { Binop($1,Cr,$3)        }
   | expr DOT expr    { Binop($1,Dot,$3)       }
+*/
+
   /* | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
   | LT matrix_value SEMI GT         { MatrixLit($2)}
   | ID LBRACK expr RBRACK { VectorElmFromID($1,$3)}

@@ -52,8 +52,8 @@ let rec string_of_sexpr (t, e) =
   | SStringLit(l) -> l
   | SBoolLit(true) -> "true"
   | SBoolLit(false) -> "false"
-  | SCharLit(l) -> "???"
-  | SMatrixLit(l) -> "???"
+  | SCharLit(_) -> "???"    (* TODO: implement/remove it  *)
+  | SMatrixLit(_) -> "???"  (* TODO: implement/remove it  *)
   | SId(s) -> s
   | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
   | SCall(f, el) ->

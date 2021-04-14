@@ -91,8 +91,8 @@ let rec string_of_expr = function
 | StringLit(l) -> l
 | BoolLit(true) -> "true"   
 | BoolLit(false) -> "false"
-| CharLit(l) -> "???"
-| MatrixLit(l) -> "???"
+| CharLit(_) -> "???"     (* TODO: implement/remove it  *)
+| MatrixLit(_) -> "???"   (* TODO: implement/remove it  *)
 | Id(s) -> s
 | Assign(v, e) -> v ^ " = " ^ string_of_expr e
 | Call(f, el) ->

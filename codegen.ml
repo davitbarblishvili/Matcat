@@ -47,7 +47,7 @@ let translate (globals, functions) =
   let printf_func : L.llvalue =
       L.declare_function "printf" printf_t the_module in
 
-  let matrix_size = Hashtbl.create 12 in
+  (* let matrix_size = Hashtbl.create 12 in *)
 
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
@@ -66,8 +66,8 @@ let translate (globals, functions) =
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
     and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder 
     and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
-    and double_format_str = L.build_global_stringptr "%g\n" "fmt" builder
-    and matrix_format_str = L.build_global_stringptr "%g " "fmt" builder
+    (* and double_format_str = L.build_global_stringptr "%g\n" "fmt" builder *)
+    (* and matrix_format_str = L.build_global_stringptr "%g " "fmt" builder *)
     (* and return_format_str = L.build_global_stringptr "\n" "fmt" builder*)
     in
 
@@ -122,13 +122,16 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_icmp L.Icmp.Sle
         | A.Greater -> L.build_icmp L.Icmp.Sgt
         | A.Geq     -> L.build_icmp L.Icmp.Sge
+        | _         -> failwith "Empty"           (* TODO: remove this line. This is simply to reduce the errors in complilation while fixing the assignment bug *)
 	  ) e1' e2' "tmp" builder
       | SUnop(op, ((t, _) as e)) ->
           let e' = expr builder e in
 	  (match op with
 	    A.Neg when t = A.Double -> L.build_fneg
 	  | A.Neg                  -> L.build_neg
-          | A.Not                  -> L.build_not) e' "tmp" builder
+    | A.Not                  -> L.build_not
+    | _ -> failwith "Empty"   (* TODO: remove this line. This is simply to reduce the errors in complilation while fixing the assignment bug *)
+    ) e' "tmp" builder
       | SCall ("print", [e]) | SCall ("printb", [e]) ->
 	      L.build_call printf_func [| int_format_str ; (expr builder e) |] 
         "printf" builder    
@@ -149,6 +152,7 @@ let translate (globals, functions) =
                         A.Void -> ""
                       | _ -> f ^ "_result") in
       L.build_call fdef (Array.of_list llargs) result builder
+      | _ -> failwith "Empty"   (* TODO: remove this line. This is simply to reduce the errors in complilation while fixing the assignment bug *)
     in
     (* LLVM insists each basic block end with exactly one "terminator" 
        instruction that transfers control.  This function runs "instr builder"
@@ -176,17 +180,17 @@ let translate (globals, functions) =
                                  | _ -> L.build_ret (expr builder e) builder );
                           builder
       | SIf (predicate, then_stmt, else_stmt) ->
-          let bool_val = expr builder predicate in
+        let bool_val = expr builder predicate in
         let merge_bb = L.append_block context "merge" the_function in
-          let build_br_merge = L.build_br merge_bb in (* partial function *)
+        let build_br_merge = L.build_br merge_bb in (* partial function *)
 
         let then_bb = L.append_block context "then" the_function in
-         add_terminal (stmt (L.builder_at_end context then_bb) then_stmt)
-          build_br_merge;
+        add_terminal (stmt (L.builder_at_end context then_bb) then_stmt)
+        build_br_merge;
      
         let else_bb = L.append_block context "else" the_function in
-        add_terminal (stmt (L.builder_at_end context else_bb) then_stmt)
-          build_br_merge;
+        add_terminal (stmt (L.builder_at_end context else_bb) else_stmt)
+        build_br_merge;
      
         ignore(L.build_cond_br bool_val then_bb else_bb builder);
         L.builder_at_end context merge_bb
@@ -210,6 +214,7 @@ let translate (globals, functions) =
       | SFor (e1, e2, e3, body) -> stmt builder
         ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )
         in
+      
      
         (* Build the code for each statement in the function *)
         let builder = stmt builder (SBlock fdecl.sbody) in
