@@ -19,16 +19,30 @@ typedef struct matrix matrix;
 
 int debug = 0;
 
+
+void reverseMatrix(matrix* input) {
+    int row = input->num_rows;
+    int col = input->num_cols;
+
+
+    for(int i = 0; i<row; i++) {
+        for(int j=0; j<col/2; j++) {
+          int temp = input->matrixAddr[i][j];
+          input->matrixAddr[i][j] = input->matrixAddr[i][col-1-j];
+          input->matrixAddr[i][col-1-j] = temp;
+
+        }       
+    }
+}
 void printMatrix(matrix* input) {
     int row = input->num_rows;
     int col = input->num_cols;
+    int temp;
     printf("(");
     printf("\n");
     for(int i = 0; i<row; i++) {
        printf("[");
-        
-        for(int j=col-1; j>=0; j--) {
-         
+        for(int j=col-1; j >= 0; j--) {
             printf("%d ", input->matrixAddr[i][j]);
         }
         printf("]");
@@ -37,6 +51,9 @@ void printMatrix(matrix* input) {
     printf(")");
 
 }
+
+
+
 
 matrix* initMatrix(int* listOfValues, int num_cols, int num_rows) {
   int** matrixValues = malloc(num_rows * sizeof(int*));
@@ -116,6 +133,29 @@ matrix* matrxAdd(matrix* lhs, matrix* rhs) {
 
   return result;
 }
+
+
+matrix* transpose(matrix* input) {
+    reverseMatrix(input);
+    int rows = input->num_cols;
+    int cols = input->num_rows;
+
+    int** matrixValues = malloc(cols * sizeof(int*));
+
+    for (int i = 0; i < rows; i++) {
+        int* matrix_col = malloc(rows * sizeof(int));
+        *(matrixValues + i) = matrix_col;
+        for (int j = 0; j < cols; j++) {
+            matrix_col[j] = *(*((input->matrixAddr) + j)+i);
+        }
+    } 
+    input->num_rows = rows;
+    input->num_cols = cols;
+    input->matrixAddr = matrixValues;
+    reverseMatrix(input);
+    return input;
+}
+
 
 #ifdef BUILD_TEST
 int main(int argc,char** argv) {

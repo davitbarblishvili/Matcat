@@ -102,6 +102,7 @@ let rec string_of_sstmt = function
   
 
 let string_of_sprogram (vars, funcs) =
+  let f' = List.rev funcs in
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_sfdecl funcs)
+  String.concat "\n" (List.map string_of_sfdecl f')
   

@@ -51,7 +51,8 @@ module StringMap = Map.Make(String)
                                  ("printd", [Double],Void);
                                  ("printm", [Matrix],Void);
                                  ("printStr", [String],Void);
-                                 ("matrxAdd", [Matrix; Matrix], Matrix) ]
+                                 ("matrxAdd", [Matrix; Matrix], Matrix);
+                                 ("transpose", [Matrix], Matrix) ]
     in
   
     (* Add function name to symbol table *)

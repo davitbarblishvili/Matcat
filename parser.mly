@@ -4,7 +4,7 @@
 open Ast
 %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN RBRACK LBRACK TRANSPOSE INVERSE
+%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN RBRACK LBRACK
 %token STRUCT
 %token NOT EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
 %token RETURN IF ELSE FOR WHILE INT STRING BOOL DOUBLE CHAR VOID
@@ -31,7 +31,7 @@ open Ast
 %left TIMES DIVIDE
 %left CR DOT
 %right NOT
-%left TRANSPOSE INVERSE
+%left
 
 %%
 
@@ -51,7 +51,7 @@ fdecl:
      { { 
 	 fname = $2;
 	 formals = List.rev $4;
-	 data_type = List.rev $6;
+	 data_type =$6;
 	 locals = List.rev $8;
 	 body = List.rev $9 } }
 formals_opt:
@@ -131,8 +131,6 @@ expr:
   | expr OR     expr { Binop($1, Or,    $3)   }
   | MINUS expr %prec NOT { Unop(Neg, $2)      }
   | NOT expr         { Unop(Not, $2)          }
-  | TRANSPOSE expr   { Unop(Transpose, $2)    }
-  | INVERSE expr     { Unop(Inverse, $2)      }
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }

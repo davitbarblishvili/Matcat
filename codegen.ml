@@ -64,6 +64,9 @@ let translate (globals, functions) =
       let add_matrix_t = L.function_type matrx_t [|matrx_t; matrx_t|] in
       let add_matrix_f = L.declare_function "matrxAdd" add_matrix_t the_module in
 
+      let transpose_matrix_t = L.function_type matrx_t [|matrx_t|] in
+      let transpose_matrix_f = L.declare_function "transpose" transpose_matrix_t the_module in
+
 
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
@@ -209,6 +212,9 @@ let translate (globals, functions) =
 
         | SCall ("printm", [e]) ->
           L.build_call printMatrix_f [| (expr builder e) |] "printm" builder
+
+        | SCall ("transpose", [e]) ->
+        L.build_call transpose_matrix_f [| (expr builder e) |] "transpose" builder
 
         | SCall (f, args) ->
           let (fdef, fdecl) = StringMap.find f function_decls in

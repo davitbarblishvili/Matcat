@@ -22,10 +22,8 @@ rule token = parse
 | '*'      { TIMES }
 | '/'      { DIVIDE }
 | '='      { ASSIGN }
-| "transpose" { TRANSPOSE }
-| "inverse"   { INVERSE }
-| "cr"       { CR }
-| "dot"       { DOT }
+| "cr"     { CR }
+| "dot"    { DOT }
 | "=="     { EQ }
 | "!="     { NEQ }
 | '<'      { LT }

@@ -8,7 +8,7 @@ type operator = Add | Sub | Mult | Div | Equal
               | Geq | And | Or | Cr | Dot 
               
 
-type unary_operator = Not | Neg | Inverse | Transpose
+type unary_operator = Not | Neg 
 
 type data_type = Int | Char | Double | String | Void | Bool | Matrix | Vector
 
@@ -68,8 +68,7 @@ let string_of_operator = function
 let string_of_uop = function
     Neg -> "-"
   | Not -> "!"
-  | Transpose -> "Transpose"
-  | Inverse -> "Inverse"
+
 
 let string_of_data_type = function
     Int -> "int"
@@ -136,7 +135,8 @@ let string_of_vdecl (t, id,_) = string_of_data_type t ^ " " ^ id ^ ";\n"
 
 
 let string_of_program (vars, funcs) =
+  let f' = List.rev funcs in
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
+  String.concat "\n" (List.map string_of_fdecl f')
 
   
