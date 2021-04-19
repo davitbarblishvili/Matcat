@@ -73,6 +73,9 @@ let translate (globals, functions) =
       let mult_matrix_t = L.function_type matrx_t [|matrx_t; matrx_t|] in
       let mult_matrix_f = L.declare_function "matrxMult" mult_matrix_t the_module in
 
+      let det_matrix_t = L.function_type double_t [|matrx_t|] in
+      let det_matrix_f = L.declare_function "det" det_matrix_t the_module in
+
 
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
@@ -216,6 +219,10 @@ let translate (globals, functions) =
 
         | SCall ("transpose", [e]) ->
         L.build_call transpose_matrix_f [| (expr builder e) |] "transpose" builder
+
+        | SCall ("det", [e]) ->
+         L.build_call det_matrix_f [| (expr builder e) |] "det" builder
+
 
         | SCall (f, args) ->
           let (fdef, fdecl) = StringMap.find f function_decls in

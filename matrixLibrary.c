@@ -16,6 +16,8 @@ struct matrix {
   int buildPosition;
 };
 typedef struct matrix matrix;
+double determinant(matrix*, int);
+
 
 int debug = 0;
 
@@ -218,6 +220,71 @@ matrix* matrxMult(matrix* lhs, matrix* rhs) {
   reverseMatrix(result);
   return result;
 }
+
+double det(matrix* input) {
+
+  int rows = input->num_rows;
+  int cols = input->num_cols; 
+  if(rows != cols){
+    die("Finding a determinant of non-square matrix is not possible");
+  }
+
+  double deter = determinant(input, cols); 
+  return 2.0;
+
+
+}
+
+double determinant(matrix* input, int k)
+{
+float s = 1, det = 0;
+int rows = input->num_rows;
+int cols = input->num_cols; 
+matrix *result = initMatrix(NULL,rows , cols);
+  int i, j, m, n, c;
+  if (k == 1)
+    {
+      printMatrix(input);
+      printf("\n%d\n",input->matrixAddr[0][0]);
+     return (input->matrixAddr[0][0]);
+    }
+  else
+    {
+     det = 0;
+     for (c = 0; c < k; c++)
+       {
+        m = 0;
+        n = 0;
+        for (i = 0;i < k; i++)
+          {
+            for (j = 0 ;j < k; j++)
+              {
+                result->matrixAddr[i][j] = 0;
+              
+                if (i != 0 && j != c)
+                 {
+                   result->matrixAddr[i][j] = input->matrixAddr[i][j];
+                   printMatrix(result);
+                   if (n < (k - 2))
+                    n++;
+                   else
+                    {
+                     n = 0;
+                     m++;
+                     }
+                   }
+               }
+             }
+          det = det + s * (input->matrixAddr[0][c] * determinant(result, k - 1));
+          s = -1 * s;
+          }
+    }
+ 
+    return (det);
+}
+
+
+
 
 
 #ifdef BUILD_TEST
