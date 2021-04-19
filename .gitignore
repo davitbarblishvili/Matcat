@@ -22,5 +22,5 @@ scanner.ml
 *.diff
 *.log
 *.native
-*.out
+/*.out
 *.tar.gz

@@ -20,7 +20,6 @@ basename=`echo $1 | sed 's/.*\\///
 reffile=`echo $1 | sed 's/.mc$//'`
 basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
-# lastSeen=""
 
 Check() {
     if [ $? -ne 0 ]; then
@@ -44,8 +43,8 @@ echo "llc -relocation-model=pic $basename.ll > $basename.s"
 llc -relocation-model=pic $basename.ll > $basename.s
 Check
 
-echo "cc -o $basename.exe $basename.s"
-cc -o $basename.exe $basename.s
+echo "cc -o $basename.exe $basename.s" "matrixLibrary.o"
+cc -o $basename.exe $basename.s matrixLibrary.o
 Check
 
 
