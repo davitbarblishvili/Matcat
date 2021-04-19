@@ -134,6 +134,24 @@ matrix* matrxAdd(matrix* lhs, matrix* rhs) {
   return result;
 }
 
+matrix* matrxSub(matrix* lhs, matrix* rhs) {
+  //check dimensions
+  if (lhs->num_rows != rhs->num_rows || lhs->num_cols != rhs->num_rows) {
+    die("matrix add size mismatch");
+  }
+  int rows = lhs->num_rows;
+  int cols= lhs->num_cols;
+  matrix *result = initMatrix(NULL, rows, cols);
+  for(int i=0; i<rows; i++) {
+    for(int j=0; j<cols; j++) {
+        int sum = lhs->matrixAddr[i][j] - rhs->matrixAddr[i][j];
+        result->matrixAddr[i][j] = sum;
+    }
+  }
+
+  return result;
+}
+
 
 matrix* transpose(matrix* input) {
     reverseMatrix(input);
@@ -154,6 +172,51 @@ matrix* transpose(matrix* input) {
     input->matrixAddr = matrixValues;
     reverseMatrix(input);
     return input;
+}
+
+matrix* dotProduct(matrix* lhs, matrix* rhs) {
+    //check to make sure matrices are the same size
+    if (lhs->num_cols != rhs->num_rows) {
+        die("Matrices are not the same size!");
+    } 
+    //once we know that matrices are same size, we can compute result
+    matrix *result = initMatrix(NULL, rhs->num_cols, lhs->num_rows);
+    for (int i=0; i < lhs->num_rows; i++)
+    {
+        for (int j=0; j < rhs->num_cols; j++)
+        {
+            for (int k=0; k < rhs->num_rows; k++)
+            {
+                result->matrixAddr[i][j] += lhs->matrixAddr[i][k] * rhs->matrixAddr[k][j];
+            }
+        }
+    }
+    return result;
+}
+
+matrix* matrxMult(matrix* lhs, matrix* rhs) {
+  //check dimensions
+  if (lhs->num_rows != rhs->num_rows || lhs->num_cols != rhs->num_rows) {
+    die("matrix add size mismatch");
+  }
+
+  reverseMatrix(lhs);
+  reverseMatrix(rhs);
+  int rows_lhs = lhs->num_rows;
+  int cols_lhs = lhs->num_cols; 
+  int rows_rhs = rhs->num_rows;
+  int cols_rhs = rhs->num_cols;
+ 
+  matrix *result = initMatrix(NULL, rows_lhs, cols_lhs);
+  for(int i=0; i<rows_lhs; i++) {
+    for(int j=0; j<cols_rhs; j++) {
+      for (int k = 0; k < cols_rhs; k++){
+        result->matrixAddr[i][j] = result->matrixAddr[i][j] + (lhs->matrixAddr[i][k] * rhs->matrixAddr[k][j]);
+      }    
+    }
+  }
+  reverseMatrix(result);
+  return result;
 }
 
 
