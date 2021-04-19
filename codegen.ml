@@ -64,6 +64,9 @@ let translate (globals, functions) =
       let add_matrix_t = L.function_type matrx_t [|matrx_t; matrx_t|] in
       let add_matrix_f = L.declare_function "matrxAdd" add_matrix_t the_module in
 
+      let sub_matrix_t = L.function_type matrx_t [|matrx_t; matrx_t|] in
+      let sub_matrix_f = L.declare_function "matrxSub" sub_matrix_t the_module in
+
       let transpose_matrix_t = L.function_type matrx_t [|matrx_t|] in
       let transpose_matrix_f = L.declare_function "transpose" transpose_matrix_t the_module in
 
@@ -151,7 +154,7 @@ let translate (globals, functions) =
           and e2' = expr builder e2 in
           (match op with
             A.Add  -> L.build_call add_matrix_f [| e1'; e2' |] "matrxAdd" builder
-          | A.Sub  -> L.build_call add_matrix_f [| e1'; e2' |] "matrxAdd" builder
+          | A.Sub  -> L.build_call sub_matrix_f [| e1'; e2' |] "matrxSub" builder
           | A.Mult -> L.build_call mult_matrix_f [| e1'; e2' |] "matrxMult" builder
           | _ -> raise (Failure "not implemented")  
           )

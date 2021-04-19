@@ -134,6 +134,24 @@ matrix* matrxAdd(matrix* lhs, matrix* rhs) {
   return result;
 }
 
+matrix* matrxSub(matrix* lhs, matrix* rhs) {
+  //check dimensions
+  if (lhs->num_rows != rhs->num_rows || lhs->num_cols != rhs->num_rows) {
+    die("matrix add size mismatch");
+  }
+  int rows = lhs->num_rows;
+  int cols= lhs->num_cols;
+  matrix *result = initMatrix(NULL, rows, cols);
+  for(int i=0; i<rows; i++) {
+    for(int j=0; j<cols; j++) {
+        int sum = lhs->matrixAddr[i][j] - rhs->matrixAddr[i][j];
+        result->matrixAddr[i][j] = sum;
+    }
+  }
+
+  return result;
+}
+
 
 matrix* transpose(matrix* input) {
     reverseMatrix(input);
