@@ -226,7 +226,7 @@ matrix* matrxMult(matrix* lhs, matrix* rhs) {
 matrix* inv(matrix* input){
   int rows = input->num_rows;
   int cols = input->num_cols; 
-  double d = det(input);
+  double d = determinant(input,rows);
   if(d == 0){
     die("\nInverse of Entered Matrix is not possible\n");
   }
@@ -265,7 +265,7 @@ matrix* cofactor(matrix* input, int f)
             }
         }
       }
-     // fac->matrixAddr[q][p] = pow(-1, q + p) * determinant(b, f - 1);
+      fac->matrixAddr[q][p] = pow(-1, q + p) * determinant(b, f - 1);
     }
   }
   return transpose(input);

@@ -7,7 +7,7 @@ matcat.native : matrixLibrary.bc
 	ocamlbuild -use-ocamlfind matcat.native -pkgs llvm,llvm.analysis,llvm.bitreader
 
 matrixLibrary : matrixLibrary.c
-	cc -o matrixLibrary -DBUILD_TEST matrixLibrary.c 
+	gcc -o matrixLibrary -DBUILD_TEST matrixLibrary.c -lm
 
 matrixLibrary.bc : matrixLibrary.c
 	clang -emit-llvm -o matrixLibrary.bc -c matrixLibrary.c -Wno-varargs
@@ -28,7 +28,6 @@ scanner.ml : scanner.mll
 clean : 
 	ocamlbuild -clean
 	rm -rf testall.log ocamlllvm *.diff *.err *.ll *.lli *.exe *.out *.s matcat.native *.mc *.o *.bc
-
 .PHONY : test
 test : matcat.native
 	./testall.sh
