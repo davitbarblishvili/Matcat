@@ -17,10 +17,10 @@ struct matrix {
   int buildPosition;
 };
 typedef struct matrix matrix;
-void inverseHelper(matrix*, matrix*, float);
+matrix* inverseHelper(matrix*, matrix*, float);
 double determinant(matrix*, int);
 double inverse(matrix*, int);
-void cofactor(matrix*, int);
+matrix* cofactor(matrix*, float);
 double det(matrix*);
 int debug = 0;
 
@@ -28,7 +28,6 @@ int debug = 0;
 void reverseMatrix(matrix* input) {
     int row = input->num_rows;
     int col = input->num_cols;
-
 
     for(int i = 0; i<row; i++) {
         for(int j=0; j<col/2; j++) {
@@ -231,15 +230,13 @@ void inv(matrix* input){
   if(d == 0){
     die("\nInverse of Entered Matrix is not possible\n");
   }
-  matrix *inverseMatrix = initMatrix(NULL, rows, cols);
-
-  cofactor(input, rows);
+   printMatrix(cofactor(input, rows));
 }
 
-void cofactor(matrix* input, int f)
+matrix* cofactor(matrix* input, float f)
 {
- matrix *b = initMatrix(NULL, f,f);
- matrix *fac = initMatrix(NULL, f,f);
+ matrix *b = initMatrix(NULL, (int)f,(int)f);
+ matrix *fac = initMatrix(NULL,(int) f,(int)f);
 
  int p, q, m, n, i, j;
  for (q = 0;q < f; q++)
@@ -265,11 +262,40 @@ void cofactor(matrix* input, int f)
             }
         }
       }
+      reverseMatrix(b);
       fac->matrixAddr[q][p] = pow(-1, q + p) * determinant(b, f - 1);
     }
   }
-  inverseHelper(input,fac,f);
+  return inverseHelper(input,fac,f);
 
+}
+
+matrix* inverseHelper(matrix* input, matrix* fac, float r)
+{
+  int i, j;
+  float d;
+  reverseMatrix(input);
+  matrix *inverse = initMatrix(NULL,(int)r ,(int) r);
+  matrix *b = initMatrix(NULL,(int)r ,(int) r);
+  
+  for (i = 0;i < r; i++)
+    {
+     for (j = 0;j < r; j++)
+       {
+         b->matrixAddr[i][j] = fac->matrixAddr[j][i];
+        }
+    }
+
+  d = determinant(input,r);
+  for (i = 0;i < r; i++)
+    {
+     for (j = 0;j < r; j++)
+       {
+        inverse->matrixAddr[i][j] = b->matrixAddr[i][j] / d;
+        }
+    }
+   reverseMatrix(inverse);
+   return inverse;
 }
 
 double det(matrix* input) {
@@ -291,8 +317,7 @@ double det(matrix* input) {
 // source code: https://www.sanfoundry.com/c-program-find-inverse-matrix/
 double determinant(matrix* input, int k)
 {
-  reverseMatrix(input);
-
+reverseMatrix(input);
 float s = 1, det = 0;
 int rows = input->num_rows;
 int cols = input->num_cols; 
@@ -337,47 +362,7 @@ if (k == 1)
     return det;
 }
 
-void inverseHelper(matrix* input, matrix* fac, float r)
-{
-  reverseMatrix(input);
-  reverseMatrix(fac);
-  printMatrix(input);
-  printMatrix(fac);
-  int i, j;
-  float d;
-  float inverse[(int)r][(int)r];
-  float b[(int)r][(int)r];
-  
-  for (i = 0;i < r; i++)
-    {
-     for (j = 0;j < r; j++)
-       {
-         b[i][j] = fac->matrixAddr[j][i];
-        }
-    }
-  d = determinant(input,r);
-  printf("%f\n",d);
 
-  for (i = 0;i < r; i++)
-    {
-     for (j = 0;j < r; j++)
-       {
-        inverse[i][j] = b[i][j] / d;
-        }
-    }
-
-   printf("\n\n\nThe inverse of matrix is : \n");
-   
- 
-   for (i = 0;i < r; i++)
-    {
-     for (j = 0;j < r; j++)
-       {
-         printf("\t%f", inverse[i][j]);
-        }
-    printf("\n");
-     }
-}
 
 
 
