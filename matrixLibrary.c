@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 
 static void die(const char *message)
@@ -17,8 +18,9 @@ struct matrix {
 };
 typedef struct matrix matrix;
 double determinant(matrix*, int);
-
-
+double inverse(matrix*, int);
+matrix* cofactor(matrix*, int);
+double det(matrix*);
 int debug = 0;
 
 
@@ -219,6 +221,55 @@ matrix* matrxMult(matrix* lhs, matrix* rhs) {
   }
   reverseMatrix(result);
   return result;
+}
+
+matrix* inv(matrix* input){
+  int rows = input->num_rows;
+  int cols = input->num_cols; 
+  double d = det(input);
+  if(d == 0){
+    die("\nInverse of Entered Matrix is not possible\n");
+  }
+  matrix *inverseMatrix = initMatrix(NULL, rows, cols);
+
+  inverseMatrix = cofactor(input, rows);
+  return inverseMatrix;
+}
+
+matrix* cofactor(matrix* input, int f)
+{
+ matrix *b = initMatrix(NULL, f,f);
+ matrix *fac = initMatrix(NULL, f,f);
+
+ int p, q, m, n, i, j;
+ for (q = 0;q < f; q++)
+ {
+   for (p = 0;p < f; p++)
+    {
+     m = 0;
+     n = 0;
+     for (i = 0;i < f; i++)
+     {
+       for (j = 0;j < f; j++)
+        {
+          if (i != q && j != p)
+          {
+            b->matrixAddr[m][n] = input->matrixAddr[i][j];
+            if (n < (f - 2))
+             n++;
+            else
+             {
+               n = 0;
+               m++;
+               }
+            }
+        }
+      }
+     // fac->matrixAddr[q][p] = pow(-1, q + p) * determinant(b, f - 1);
+    }
+  }
+  return transpose(input);
+
 }
 
 double det(matrix* input) {

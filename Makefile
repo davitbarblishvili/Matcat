@@ -7,7 +7,7 @@ matcat.native : matrixLibrary.bc
 	ocamlbuild -use-ocamlfind matcat.native -pkgs llvm,llvm.analysis,llvm.bitreader
 
 matrixLibrary : matrixLibrary.c
-	cc -o matrixLibrary -DBUILD_TEST matrixLibrary.c
+	cc -o matrixLibrary -DBUILD_TEST matrixLibrary.c 
 
 matrixLibrary.bc : matrixLibrary.c
 	clang -emit-llvm -o matrixLibrary.bc -c matrixLibrary.c -Wno-varargs
