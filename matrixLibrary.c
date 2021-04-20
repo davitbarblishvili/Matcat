@@ -13,13 +13,14 @@ static void die(const char *message)
 struct matrix {
   int num_rows;
   int num_cols;
-  int** matrixAddr; // accessed [row][col]
+  float** matrixAddr; // accessed [row][col]
   int buildPosition;
 };
 typedef struct matrix matrix;
+void inverseHelper(matrix*, matrix*, float);
 double determinant(matrix*, int);
 double inverse(matrix*, int);
-matrix* cofactor(matrix*, int);
+void cofactor(matrix*, int);
 double det(matrix*);
 int debug = 0;
 
@@ -31,7 +32,7 @@ void reverseMatrix(matrix* input) {
 
     for(int i = 0; i<row; i++) {
         for(int j=0; j<col/2; j++) {
-          int temp = input->matrixAddr[i][j];
+          float temp = input->matrixAddr[i][j];
           input->matrixAddr[i][j] = input->matrixAddr[i][col-1-j];
           input->matrixAddr[i][col-1-j] = temp;
 
@@ -47,7 +48,7 @@ void printMatrix(matrix* input) {
     for(int i = 0; i<row; i++) {
        printf("[");
         for(int j=col-1; j >= 0; j--) {
-            printf("%d ", input->matrixAddr[i][j]);
+            printf("%.2f ", input->matrixAddr[i][j]);
         }
         printf("]");
         printf("\n");
@@ -59,8 +60,8 @@ void printMatrix(matrix* input) {
 
 
 
-matrix* initMatrix(int* listOfValues, int num_cols, int num_rows) {
-  int** matrixValues = malloc(num_rows * sizeof(int*));
+matrix* initMatrix(float* listOfValues, int num_cols, int num_rows) {
+  float** matrixValues = malloc(num_rows * sizeof(float*));
 
   if(debug == 1) {
       printf("Building matrix:\n");
@@ -71,7 +72,7 @@ matrix* initMatrix(int* listOfValues, int num_cols, int num_rows) {
   //set all values in matrix to NULL if list of values is NULL
   if (listOfValues == NULL) {
     for(int i = 0; i < num_rows; i++) {
-      int* matrix_row = malloc(num_cols * sizeof(int));
+      float* matrix_row = malloc(num_cols * sizeof(float));
       *(matrixValues + i) = matrix_row;
       for(int j = 0; j < num_cols; j++) {
         matrix_row[j] = 0;
@@ -82,7 +83,7 @@ matrix* initMatrix(int* listOfValues, int num_cols, int num_rows) {
   //load values from a list of values
   else {
     for(int i = 0; i < num_cols; i++) {
-      int* matrix_col = malloc(num_rows * sizeof(int));
+      float* matrix_col = malloc(num_rows * sizeof(float));
       *(matrixValues + i) = matrix_col;
       for(int j = 0; j < num_rows; j++) {
         matrix_col[j] = listOfValues[i*num_rows + j];
@@ -162,10 +163,10 @@ matrix* transpose(matrix* input) {
     int rows = input->num_cols;
     int cols = input->num_rows;
 
-    int** matrixValues = malloc(cols * sizeof(int*));
+    float** matrixValues = malloc(cols * sizeof(float*));
 
     for (int i = 0; i < rows; i++) {
-        int* matrix_col = malloc(rows * sizeof(int));
+        float* matrix_col = malloc(rows * sizeof(float));
         *(matrixValues + i) = matrix_col;
         for (int j = 0; j < cols; j++) {
             matrix_col[j] = *(*((input->matrixAddr) + j)+i);
@@ -223,7 +224,7 @@ matrix* matrxMult(matrix* lhs, matrix* rhs) {
   return result;
 }
 
-matrix* inv(matrix* input){
+void inv(matrix* input){
   int rows = input->num_rows;
   int cols = input->num_cols; 
   double d = determinant(input,rows);
@@ -232,11 +233,10 @@ matrix* inv(matrix* input){
   }
   matrix *inverseMatrix = initMatrix(NULL, rows, cols);
 
-  inverseMatrix = cofactor(input, rows);
-  return inverseMatrix;
+  cofactor(input, rows);
 }
 
-matrix* cofactor(matrix* input, int f)
+void cofactor(matrix* input, int f)
 {
  matrix *b = initMatrix(NULL, f,f);
  matrix *fac = initMatrix(NULL, f,f);
@@ -268,7 +268,7 @@ matrix* cofactor(matrix* input, int f)
       fac->matrixAddr[q][p] = pow(-1, q + p) * determinant(b, f - 1);
     }
   }
-  return transpose(input);
+  inverseHelper(input,fac,f);
 
 }
 
@@ -279,9 +279,9 @@ double det(matrix* input) {
   if(rows != cols){
     die("Finding a determinant of non-square matrix is not possible");
   }
-  reverseMatrix(input);
+  
   double deter = determinant(input, cols); 
-  printf("%f\n",deter);
+  printf("%.2f\n",deter);
   return deter;
 
 
@@ -291,6 +291,8 @@ double det(matrix* input) {
 // source code: https://www.sanfoundry.com/c-program-find-inverse-matrix/
 double determinant(matrix* input, int k)
 {
+  reverseMatrix(input);
+
 float s = 1, det = 0;
 int rows = input->num_rows;
 int cols = input->num_cols; 
@@ -326,13 +328,55 @@ if (k == 1)
                    }
                }
              }
-
+          reverseMatrix(result);
           det = det + s * (input->matrixAddr[0][c] * determinant(result, k - 1));
           s = -1 * s;
           }
     }
  
     return det;
+}
+
+void inverseHelper(matrix* input, matrix* fac, float r)
+{
+  reverseMatrix(input);
+  reverseMatrix(fac);
+  printMatrix(input);
+  printMatrix(fac);
+  int i, j;
+  float d;
+  float inverse[(int)r][(int)r];
+  float b[(int)r][(int)r];
+  
+  for (i = 0;i < r; i++)
+    {
+     for (j = 0;j < r; j++)
+       {
+         b[i][j] = fac->matrixAddr[j][i];
+        }
+    }
+  d = determinant(input,r);
+  printf("%f\n",d);
+
+  for (i = 0;i < r; i++)
+    {
+     for (j = 0;j < r; j++)
+       {
+        inverse[i][j] = b[i][j] / d;
+        }
+    }
+
+   printf("\n\n\nThe inverse of matrix is : \n");
+   
+ 
+   for (i = 0;i < r; i++)
+    {
+     for (j = 0;j < r; j++)
+       {
+         printf("\t%f", inverse[i][j]);
+        }
+    printf("\n");
+     }
 }
 
 
