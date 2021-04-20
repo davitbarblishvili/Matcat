@@ -228,26 +228,27 @@ double det(matrix* input) {
   if(rows != cols){
     die("Finding a determinant of non-square matrix is not possible");
   }
-
+  reverseMatrix(input);
   double deter = determinant(input, cols); 
-  return 2.0;
+  printf("%f\n",deter);
+  return deter;
 
 
 }
 
+
+// source code: https://www.sanfoundry.com/c-program-find-inverse-matrix/
 double determinant(matrix* input, int k)
 {
 float s = 1, det = 0;
 int rows = input->num_rows;
 int cols = input->num_cols; 
 matrix *result = initMatrix(NULL,rows , cols);
-  int i, j, m, n, c;
-  if (k == 1)
-    {
-      printMatrix(input);
-      printf("\n%d\n",input->matrixAddr[0][0]);
-     return (input->matrixAddr[0][0]);
-    }
+int i, j, m, n, c;
+if (k == 1)
+  {
+   return (input->matrixAddr[0][0]);
+  }
   else
     {
      det = 0;
@@ -263,8 +264,7 @@ matrix *result = initMatrix(NULL,rows , cols);
               
                 if (i != 0 && j != c)
                  {
-                   result->matrixAddr[i][j] = input->matrixAddr[i][j];
-                   printMatrix(result);
+                   result->matrixAddr[m][n] = input->matrixAddr[i][j];
                    if (n < (k - 2))
                     n++;
                    else
@@ -275,12 +275,13 @@ matrix *result = initMatrix(NULL,rows , cols);
                    }
                }
              }
+
           det = det + s * (input->matrixAddr[0][c] * determinant(result, k - 1));
           s = -1 * s;
           }
     }
  
-    return (det);
+    return det;
 }
 
 

@@ -88,8 +88,8 @@ module StringMap = Map.Make(String)
       (* Raise an exception if the given rvalue type cannot be assigned to
          the given lvalue type *)
       let check_assign lvaluet rvaluet err =
-         if lvaluet = rvaluet then lvaluet else raise (Failure err)
-      in   
+        if lvaluet = rvaluet then lvaluet else raise (Failure err)
+      in    
 
       let rec get_dims = function
       MatrixLit l -> List.length l :: get_dims (List.hd l)
