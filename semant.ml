@@ -155,7 +155,6 @@ module StringMap = Map.Make(String)
         | Binop(e1, op, e2) as e -> 
             let (t1, e1') = expr e1 
             and (t2, e2') = expr e2 in
-            (* All binary operators require operands of the same type *)
             let same = t1 = t2 in
             (* Determine expression type based on operator and operand types *)
             let ty = match op with
@@ -166,6 +165,7 @@ module StringMap = Map.Make(String)
                        when same && (t1 = Int || t1 = Double) -> Bool
             | And | Or when same && t1 = Bool -> Bool
             | Add | Sub  | Mult when same && t1 = Matrix -> Matrix
+            | Mult when t1 = Int && t2 = Matrix -> Matrix
             | Dot when same && t1 = Matrix -> Double
             | _ -> raise (
           Failure ("illegal binary operator " ^

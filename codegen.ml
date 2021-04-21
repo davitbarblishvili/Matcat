@@ -3,6 +3,7 @@ I have removed part of the code that is not involved in printing "hello world" *
 
 module L = Llvm
 module A = Ast
+module S = Sast
 open Sast
 
 module StringMap = Map.Make(String)
@@ -82,10 +83,10 @@ let translate (globals, functions) =
       let dot_matrix_t = L.function_type double_t [|matrx_t; matrx_t|] in
       let dot_matrix_f = L.declare_function "dot" dot_matrix_t the_module in
 
+      let scalar_matrix_t = L.function_type matrx_t [|i32_t; matrx_t|] in
+      let scalar_matrix_f = L.declare_function "scaleMatrix" scalar_matrix_t the_module in
+
       
-
-
-
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
       let name = fdecl.sfname
@@ -134,13 +135,7 @@ let translate (globals, functions) =
     with Not_found -> StringMap.find n global_vars
     in
 
-    let is_matrix ptr = 
-      let ltype_string = L.string_of_lltype (L.type_of ptr) in
-      match ltype_string with
-        "%matrix_t*" -> true
-      | _ -> false
-    in
-
+  
     let rec expr builder ((_, e) : sexpr) = match e with
 	      SIntLit i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
@@ -171,6 +166,8 @@ let translate (globals, functions) =
           | A.Dot -> L.build_call dot_matrix_f [| e1'; e2' |] "dot" builder
           | _ -> raise (Failure "not implemented")  
           )
+
+
       | SBinop ((A.Double,_ ) as e1, op, e2) ->
         let e1' = expr builder e1
         and e2' = expr builder e2 in

@@ -35,8 +35,7 @@ type stmt =
 | If of expr * stmt * stmt
 | For of expr * expr * expr * stmt
 | While of expr * stmt
-(*our func lists return types before body of the funct
-Also not sure where to include Funct keyword- I figured it out :) *)
+
 
 type func_decl = {
     fname : string;

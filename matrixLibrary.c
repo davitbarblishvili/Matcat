@@ -141,7 +141,7 @@ matrix* matrxAdd(matrix* lhs, matrix* rhs) {
 matrix* matrxSub(matrix* lhs, matrix* rhs) {
   //check dimensions
   if (lhs->num_rows != rhs->num_rows || lhs->num_cols != rhs->num_rows) {
-    die("matrix add size mismatch");
+    die("matrix sub size mismatch");
   }
   int rows = lhs->num_rows;
   int cols= lhs->num_cols;
@@ -183,7 +183,7 @@ matrix* transpose(matrix* input) {
 matrix* matrxMult(matrix* lhs, matrix* rhs) {
   //check dimensions
   if (lhs->num_rows != rhs->num_rows || lhs->num_cols != rhs->num_rows) {
-    die("matrix add size mismatch");
+    die("matrix mult size mismatch");
   }
 
   reverseMatrix(lhs);
@@ -364,6 +364,20 @@ float dot(matrix* lhs, matrix* rhs) {
     return dotPr;
 }
 
+
+matrix* scaleMatrix(matrix* input, int scalar) {
+  int rows = input->num_rows;
+  int cols= input->num_cols;
+  matrix *result = initMatrix(NULL, rows, cols);
+  for(int i=0; i<rows; i++) {
+    for(int j=0; j<cols; j++) {
+        int product = input->matrixAddr[i][j] * scalar;
+        result->matrixAddr[i][j] = product;
+    }
+  }
+
+  return result;
+}
 
 
 
