@@ -79,6 +79,9 @@ let translate (globals, functions) =
       let inv_matrix_t = L.function_type matrx_t [|matrx_t|] in
       let inv_matrix_f = L.declare_function "inv" transpose_matrix_t the_module in
 
+      let dot_matrix_t = L.function_type double_t [|matrx_t; matrx_t|] in
+      let dot_matrix_f = L.declare_function "dot" dot_matrix_t the_module in
+
       
 
 
@@ -165,6 +168,7 @@ let translate (globals, functions) =
             A.Add  -> L.build_call add_matrix_f [| e1'; e2' |] "matrxAdd" builder
           | A.Sub  -> L.build_call sub_matrix_f [| e1'; e2' |] "matrxSub" builder
           | A.Mult -> L.build_call mult_matrix_f [| e1'; e2' |] "matrxMult" builder
+          | A.Dot -> L.build_call dot_matrix_f [| e1'; e2' |] "dot" builder
           | _ -> raise (Failure "not implemented")  
           )
       | SBinop ((A.Double,_ ) as e1, op, e2) ->

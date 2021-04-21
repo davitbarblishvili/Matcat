@@ -178,25 +178,7 @@ matrix* transpose(matrix* input) {
     return input;
 }
 
-matrix* dotProduct(matrix* lhs, matrix* rhs) {
-    //check to make sure matrices are the same size
-    if (lhs->num_cols != rhs->num_rows) {
-        die("Matrices are not the same size!");
-    } 
-    //once we know that matrices are same size, we can compute result
-    matrix *result = initMatrix(NULL, rhs->num_cols, lhs->num_rows);
-    for (int i=0; i < lhs->num_rows; i++)
-    {
-        for (int j=0; j < rhs->num_cols; j++)
-        {
-            for (int k=0; k < rhs->num_rows; k++)
-            {
-                result->matrixAddr[i][j] += lhs->matrixAddr[i][k] * rhs->matrixAddr[k][j];
-            }
-        }
-    }
-    return result;
-}
+
 
 matrix* matrxMult(matrix* lhs, matrix* rhs) {
   //check dimensions
@@ -230,7 +212,9 @@ void inv(matrix* input){
   if(d == 0){
     die("\nInverse of Entered Matrix is not possible\n");
   }
-   printMatrix(cofactor(input, rows));
+   input = (cofactor(input, rows));
+   printMatrix(input);
+
 }
 
 matrix* cofactor(matrix* input, float f)
@@ -360,6 +344,24 @@ if (k == 1)
     }
  
     return det;
+}
+
+float dot(matrix* lhs, matrix* rhs) {
+    //check to make sure matrices are the same size
+    if (lhs->num_rows != rhs->num_rows || lhs->num_cols != rhs->num_cols) {
+        die("Matrices are not the same size!");
+    } 
+    float dotPr = 0.0;
+    //once we know that matrices are same size, we can compute result
+    for (int i=0; i < lhs->num_rows; i++)
+    {
+        for (int j=0; j < rhs->num_cols; j++)
+        {  
+          dotPr += lhs->matrixAddr[i][j] * rhs->matrixAddr[i][j];
+        }
+    }
+    printf("%.2f\n",dotPr);
+    return dotPr;
 }
 
 

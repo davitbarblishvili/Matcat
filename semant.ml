@@ -165,7 +165,8 @@ module StringMap = Map.Make(String)
             | Less | Leq | Greater | Geq
                        when same && (t1 = Int || t1 = Double) -> Bool
             | And | Or when same && t1 = Bool -> Bool
-            | Add | Sub | Dot | Mult when same && t1 = Matrix -> Matrix
+            | Add | Sub  | Mult when same && t1 = Matrix -> Matrix
+            | Dot when same && t1 = Matrix -> Double
             | _ -> raise (
           Failure ("illegal binary operator " ^
                          string_of_data_type t1 ^ " " ^ string_of_operator op ^ " " ^
