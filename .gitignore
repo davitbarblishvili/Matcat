@@ -8,6 +8,8 @@
 *.cmxs
 *.o
 
+*.bc
+
 # MacOS related
 .DS_Store
 
@@ -16,7 +18,7 @@ _build
 # We should be delete these files. Ignore for now.
 MicroC
 # We have a README to show the "overview"
-overview.txt    
+overview.txt
 
 scanner.ml
 *.diff
