@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <unistd.h>
 
 
 static void die(const char *message)
@@ -533,6 +534,18 @@ void rref(matrix* input) {
   reverseMatrix(input);
   printMatrix(rref_helper(input,1e-6));
 
+}
+
+void isInv(matrix* input) {
+  double d = determinant(input,input->num_rows);
+  if (d == 0){
+    printf("%s\n","This matrix is not invertible");
+  }else{
+    printf("%s\n","This matrix is invertible");
+    printf("%s\n","calculating inverse...");
+    reverseMatrix(input);
+    inv(input);
+  }
 }
 
 
