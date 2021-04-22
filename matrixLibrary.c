@@ -22,6 +22,7 @@ double determinant(matrix*, int);
 double inverse(matrix*, int);
 matrix* cofactor(matrix*, float);
 double det(matrix*);
+matrix* rref_helper(matrix*, double);
 int debug = 0;
 
 
@@ -426,6 +427,112 @@ matrix* scalarDivDoubleMatrix(matrix* input, double scalar) {
     }
   }
   return result;
+}
+
+
+void cleanUpMatrix (matrix* oMatrix,  double tolerance) {
+	
+	// Removes all numbers close to zero, i.e between -tol and +tol 
+	for (int i = 0; i < oMatrix->num_rows; i++)
+		for (int j = 0; j < oMatrix->num_cols; j++)
+			if (fabs (oMatrix->matrixAddr[i][j]) < tolerance)
+				oMatrix->matrixAddr[i][j] = 0;
+}
+
+void exchangeRows (matrix* oMatrix, int r1, int r2) {
+ 
+	double t = 0;
+	for (int i = 0; i < oMatrix->num_cols; i++) {
+		t = oMatrix->matrixAddr[r1][i];
+		oMatrix->matrixAddr[r1][i] = oMatrix->matrixAddr[r2][i];
+		oMatrix->matrixAddr[r2][i] = t;
+	}
+}
+
+double getValue (matrix* oMatrix, int i, int j) {
+	
+	if ((i < 0) || (j < 0)) {
+		printf ("Error in indexing\n");
+		getchar ();
+		exit (0);
+	}
+ 
+	if ((i >= oMatrix->num_rows) || (j >= oMatrix->num_cols)) {
+		printf ("Error in indexing: %d, %d\n", i, j);
+		getchar ();
+		exit (0);
+	}
+ 
+	return oMatrix->matrixAddr[i][j];
+}
+
+
+
+matrix* rref_helper(matrix* oMatrix, double tolerance)
+{
+	int currentRow; double factor;
+ 
+	matrix* oEchelon = initMatrix(NULL,oMatrix->num_rows, oMatrix->num_cols);
+ 
+	// Make a copy and work on that.
+	for (int i = 0; i < oMatrix->num_rows; i++)
+		for (int j = 0; j < oMatrix->num_cols; j++)
+			oEchelon->matrixAddr[i][j] = oMatrix->matrixAddr[i][j];
+ 
+	int Arow = 0; int Acol = 0;
+	while ((Arow < oEchelon->num_rows) && (Acol < oEchelon->num_cols)) {
+		// locate a nonzero column
+		if (abs (getValue (oEchelon, Arow, Acol) < tolerance)) {
+			// If the entry is zero work our way down the matrix
+			// looking for a nonzero entry, when found, swap it for Arow 
+			currentRow = Arow;
+			do {
+				// next row
+				currentRow++;
+				// Have we reached the end of the rows but we've still got columns left to scan?
+				if ((currentRow >= oEchelon->num_rows) && (Acol <= oEchelon->num_cols)) {
+					// reset row counter back to where it was and try next column 
+					currentRow = Arow; Acol++;
+				}
+ 
+				// If we've scanned the whole matrix, then lets get out... 
+				if (currentRow >= oEchelon->num_rows) {
+					cleanUpMatrix (oEchelon, tolerance);
+					return oEchelon;
+				}
+			} while (fabs (getValue (oEchelon, currentRow, Acol)) < tolerance);
+ 
+			// We've found a nonzero row entry so swap it with 'Arow' which did have a zero as its entry 
+			exchangeRows (oEchelon, Arow, currentRow);
+		}
+		// Arow now holds the row of interest }
+		factor = 1.0 / getValue (oEchelon, Arow, Acol);
+		// reduce all the entries along the column by the factor 
+		for (int i = Acol; i < oEchelon->num_cols; i++)
+			oEchelon->matrixAddr[Arow][i] = getValue (oEchelon, Arow, i) * factor;
+ 
+		// now eliminate all entries above and below Arow, this generates the reduced form 
+		for (int i = 0; i < oEchelon->num_rows; i++) {
+			// miss out Arow itself 
+			if ((i != Arow) && (fabs (getValue (oEchelon, i, Acol)) > tolerance)) {
+				factor = getValue (oEchelon, i, Acol);
+				// work your way along the column doing the same operation 
+				for (int j = Acol; j < oEchelon->num_cols; j++) {
+					oEchelon->matrixAddr[i][j] = getValue (oEchelon, i, j) - factor * getValue (oEchelon, Arow, j);
+				}
+			}
+		}
+ 
+		Arow++; Acol++;
+	}
+	cleanUpMatrix (oEchelon, tolerance);
+	return oEchelon;
+}
+
+void rref(matrix* input) {
+  reverseMatrix(input);
+  printMatrix(rref_helper(input,1e-6));
+
 }
 
 

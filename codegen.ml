@@ -95,6 +95,9 @@ let translate (globals, functions) =
       let scalarDivDouble_matrix_t = L.function_type matrx_t [|matrx_t; double_t|] in
       let scalarDivDouble_matrix_f = L.declare_function "scalarDivDoubleMatrix" scalarDivDouble_matrix_t the_module in
 
+      let rref_matrix_t = L.function_type matrx_t [|matrx_t|] in
+      let rref_matrix_f = L.declare_function "rref" rref_matrix_t the_module in
+
       
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
@@ -275,6 +278,9 @@ let translate (globals, functions) =
 
         | SCall ("det", [e]) ->
          L.build_call det_matrix_f [| (expr builder e) |] "det" builder
+
+         | SCall ("rref", [e]) ->
+         L.build_call rref_matrix_f [| (expr builder e) |] "rref" builder
 
 
         | SCall (f, args) ->
