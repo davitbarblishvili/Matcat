@@ -41,19 +41,18 @@ program:
   
 decls:
    /* nothing */ { ([], [])               }
- | decls vdecl { (($2 :: fst $1), snd $1) }
+ | decls stmt { (($2 :: fst $1), snd $1) }
  | decls fdecl { (fst $1, ($2 :: snd $1)) }
 
 fdecl:
     /* if this is func decl, how do we write that we can return as much var as we want */
 	  /* added FUNC, also types which will be what types it returns */
-   FUNC ID LPAREN formals_opt RPAREN typ LBRACE vdecl_list stmt_list RBRACE 
+   FUNC ID LPAREN formals_opt RPAREN typ LBRACE stmt_list RBRACE 
      { { 
 	 fname = $2;
 	 formals = List.rev $4;
 	 data_type = $6;
-	 locals = List.rev $8;
-	 body = List.rev $9 } }
+	 body = List.rev $8 } }
 formals_opt:
     /* nothing */ { [] }
   | formal_list   { $1 }
@@ -77,15 +76,6 @@ typ:
   | VECTOR  { Vector }
   | STRING  { String }
 
-
-vdecl_list:
-    /* nothing */    { [] }
-  | vdecl_list vdecl { $2 :: $1 }
-
-vdecl:
-   typ ID SEMI { ($1, $2) }
-  /* |typ ID ASSIGN expr SEMI { ($1, $2, Assign($2,$4))} */
-
 stmt_list:
     /* nothing */  { [] }
   | stmt_list stmt { $2 :: $1 }
@@ -100,6 +90,7 @@ stmt:
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
                                             { For($3, $5, $7, $9)   }
   | WHILE LPAREN expr RPAREN stmt           { While($3, $5)         }
+  | typ ID SEMI                             { Declare($1, $2)       }
   
 expr_opt:
     /* nothing */ { Noexpr }
@@ -133,6 +124,7 @@ expr:
   | INVERSE expr     { Unop(Inverse, $2)      }
 */
   | ID ASSIGN expr   { Assign($1, $3)         }
+  | typ ID ASSIGN expr   { DnAssign($1, $2, $4)   }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
   /* added */

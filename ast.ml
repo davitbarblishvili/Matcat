@@ -41,7 +41,6 @@ type func_decl = {
     fname : string;
     formals : bind list;
 	  data_type : data_type;
-    locals : bind list;
     body : stmt list;
   }
 
@@ -121,7 +120,6 @@ let string_of_fdecl fdecl =
   ") " ^
   string_of_data_type fdecl.data_type ^
   "{\n" ^
-  String.concat "" (List.map string_of_vdecl fdecl.locals) ^
   String.concat "" (List.map string_of_stmt fdecl.body) ^
   "}\n" 
 

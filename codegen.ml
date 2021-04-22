@@ -86,10 +86,9 @@ let translate (globals, functions) =
       in
 
       let sformals = List.map (fun (tp, vName) -> (tp, vName)) fdecl.sformals in
-      let slocals = List.map (fun (tp, vName) -> (tp, vName)) fdecl.slocals in
       let formals = List.fold_left2 add_formal StringMap.empty sformals
           (Array.to_list (L.params the_function)) in
-      List.fold_left add_local formals slocals
+      List.fold_left add_local formals
     in
 
 
