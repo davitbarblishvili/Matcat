@@ -372,7 +372,23 @@ matrix* scaleMatrix(matrix* input, int scalar) {
   
   for(int i=0; i<rows; i++) {
     for(int j=0; j < cols; j++) {
-        float product = input->matrixAddr[i][j] * scalar;
+        double product = input->matrixAddr[i][j] * scalar;
+        result->matrixAddr[i][j] = product;
+    }
+  }
+
+  return result;
+}
+
+matrix* scaleMatrixDouble(matrix* input, double scalar) {
+  int rows = input->num_rows;
+  int cols= input->num_cols;
+  matrix *result = initMatrix(NULL, cols, rows);
+
+  
+  for(int i=0; i<rows; i++) {
+    for(int j=0; j < cols; j++) {
+        double product = input->matrixAddr[i][j] * scalar;
         result->matrixAddr[i][j] = product;
     }
   }
@@ -388,6 +404,24 @@ matrix* scalarDivMatrix(matrix* input, int scalar) {
   for(int i=0; i<rows; i++) {
     for(int j=0; j < cols; j++) {
         float product = input->matrixAddr[i][j] / scalar;
+        result->matrixAddr[i][j] = product;
+    }
+  }
+  return result;
+}
+
+matrix* scalarDivDoubleMatrix(matrix* input, double scalar) {
+  if(scalar == 0){
+    die("division by 0 is not allowed in thsi universe");
+  }
+  int rows = input->num_rows;
+  int cols= input->num_cols;
+  matrix *result = initMatrix(NULL, cols, rows);
+
+  
+  for(int i=0; i<rows; i++) {
+    for(int j=0; j < cols; j++) {
+        double product = input->matrixAddr[i][j] / scalar;
         result->matrixAddr[i][j] = product;
     }
   }

@@ -86,8 +86,14 @@ let translate (globals, functions) =
       let scalar_matrix_t = L.function_type matrx_t [|matrx_t; i32_t|] in
       let scalar_matrix_f = L.declare_function "scaleMatrix" scalar_matrix_t the_module in
 
+      let scalarDouble_matrix_t = L.function_type matrx_t [|matrx_t; double_t|] in
+      let scalarDouble_matrix_f = L.declare_function "scaleMatrixDouble" scalarDouble_matrix_t the_module in
+
       let scalarDiv_matrix_t = L.function_type matrx_t [|matrx_t; i32_t|] in
       let scalarDiv_matrix_f = L.declare_function "scalarDivMatrix" scalarDiv_matrix_t the_module in
+
+      let scalarDivDouble_matrix_t = L.function_type matrx_t [|matrx_t; double_t|] in
+      let scalarDivDouble_matrix_f = L.declare_function "scalarDivDoubleMatrix" scalarDivDouble_matrix_t the_module in
 
       
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -178,6 +184,14 @@ let translate (globals, functions) =
           | _ -> raise (Failure "not implemented")    
           )
 
+         | SBinop (((A.Double,_)  as e1), op, ((A.Matrix,_) as e2))  when  op = A.Mult -> 
+          let e1' = expr builder e1
+          and e2' = expr builder e2 in
+          (match op with
+          | A.Mult -> L.build_call scalarDouble_matrix_f [| e2'; e1' |] "scaleMatrixDouble" builder
+          | _ -> raise (Failure "not implemented")    
+          )
+
        | SBinop (((A.Matrix,_)  as e1), op, ((A.Int,_) as e2))  when op = A.Div -> 
           let e1' = expr builder e1
           and e2' = expr builder e2 in
@@ -185,6 +199,15 @@ let translate (globals, functions) =
           | A.Div -> L.build_call scalarDiv_matrix_f [| e1'; e2' |] "scalarDivMatrix" builder
           | _ -> raise (Failure "not implemented")    
           )
+
+          | SBinop (((A.Matrix,_)  as e1), op, ((A.Double,_) as e2))  when op = A.Div -> 
+          let e1' = expr builder e1
+          and e2' = expr builder e2 in
+          (match op with
+          | A.Div -> L.build_call scalarDivDouble_matrix_f [| e1'; e2' |] "scalarDivDoubleMatrix" builder
+          | _ -> raise (Failure "not implemented")    
+          )
+
 
 
 
