@@ -6,9 +6,10 @@ This is a class project for COMS W4115 Programming Languages and Translators, Sp
 
 ## Environment
 
-Our compiler is developed and have been tested on
-- MacOS with OCaml 4.10.0 and LLVM 6.0;
-- MacOS with OCaml 4.10.0 and LLVM 11.1.0;
+Our compiler is developed and has been tested on
+- Ubuntu 18.04 with OCaml 4.10.0 and LLVM 6.0;
+- macOS with OCaml 4.10.0 and LLVM 6.0;
+- macOS with OCaml 4.10.0 and LLVM 11.1.0;
 
 To set up the environment to build the language, please install Ocaml and LLVM.
 
@@ -17,7 +18,7 @@ The instructions of installing Ocaml and LLVM can be found here:
 - https://llvm.org/docs/GettingStartedTutorials.html
 
 Other than installing Ocaml and LLVM manually, you may also run a docker to build and run Matcat.
-You may run the following commands to setup the docker environment:
+You may run the following commands to set up the docker environment:
 
 ```
 docker build . -t mcDocker
@@ -26,7 +27,7 @@ docker run --rm -it -v `pwd`:/home/mc -w=/home/mc mcDocker
 
 ## Usage
 
-### Building the Lanauge
+### Building the Language
 
 To build the language, clone this repository and run:
 
