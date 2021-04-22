@@ -38,7 +38,7 @@ module StringMap = Map.Make(String)
     (* Collect function declarations for built-in functions: no bodies *)
     let built_in_decls = 
       let add_bind map (name, ty,ret) = StringMap.add name {
-        data_type = [Void;Void];
+        data_type = Void;
         fname = name; 
         formals =
       (let rec create_ty_list = (function
@@ -192,7 +192,7 @@ module StringMap = Map.Make(String)
 
            let fdFormals = List.map (fun (tp, vName, _) -> (tp, vName) ) fd.formals in
           let args' = List.map2 check_call fdFormals args
-          in (List.hd fd.data_type, SCall(fname, args'))
+          in (fd.data_type, SCall(fname, args'))
       in
   
       let check_bool_expr e = 
@@ -209,10 +209,10 @@ module StringMap = Map.Make(String)
           SFor(expr e1, check_bool_expr e2, expr e3, check_stmt st)
         | While(p, s) -> SWhile(check_bool_expr p, check_stmt s)
         | Return e -> let (t, e') = expr e in
-        if t = List.hd func.data_type then SReturn (t, e') 
+        if t = func.data_type then SReturn (t, e') 
         else raise (
 	      Failure ("return gives " ^ string_of_data_type t ^ " expected " ^
-		   string_of_data_type (List.hd func.data_type) ^ " in " ^ string_of_expr e))
+		   string_of_data_type func.data_type ^ " in " ^ string_of_expr e))
         
         (* A block is correct if each statement is correct and nothing
            follows any Return statement.  Nested blocks are flattened. *)

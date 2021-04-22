@@ -35,7 +35,7 @@ type sstmt =
 type sfunc_decl = {
     sfname : string;
     sformals : bind list;
-	  sdata_type : data_type list;
+	  sdata_type : data_type;
     slocals : bind list;
     sbody : sstmt list;
   }
@@ -83,7 +83,7 @@ let rec string_of_sstmt = function
     let string_of_sfdecl fdecl =
       "func " ^
       fdecl.sfname ^ "(" ^ String.concat ", " (List.map (fun (_, vName, _) -> vName) fdecl.sformals) ^
-      ")" ^ String.concat "" (List.map string_of_data_type fdecl.sdata_type) ^ "\n{\n" ^
+      ")" ^ string_of_data_type fdecl.sdata_type ^ "\n{\n" ^
       String.concat "" (List.map string_of_vdecl fdecl.slocals) ^
       String.concat "" (List.map string_of_sstmt fdecl.sbody) ^
       "}\n"    

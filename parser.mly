@@ -47,7 +47,7 @@ decls:
 fdecl:
     /* if this is func decl, how do we write that we can return as much var as we want */
 	  /* added FUNC, also types which will be what types it returns */
-   FUNC ID LPAREN formals_opt RPAREN type_list LBRACE vdecl_list stmt_list RBRACE 
+   FUNC ID LPAREN formals_opt RPAREN typ LBRACE vdecl_list stmt_list RBRACE 
      { { 
 	 fname = $2;
 	 formals = List.rev $4;
@@ -61,13 +61,6 @@ formals_opt:
 formal_list:
     typ ID                   { [($1,$2,Noexpr)]     }
   | formal_list COMMA typ ID { ($3,$4,Noexpr) :: $1 }
-
-/* func sumAndDiff(int one, int two) int, int { */
-/* This is for the part that function can return more than one type */
-/* either we have 1 type or a lot seperated by comma */
-type_list:
-    typ              {[($1)]}
-  | type_list COMMA typ  {$3::$1}
 
 /* added matrix and vector in types */
 typ:
