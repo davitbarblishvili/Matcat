@@ -167,6 +167,7 @@ module StringMap = Map.Make(String)
             | Add | Sub  | Mult when same && t1 = Matrix -> Matrix
             | Mult when t1 = Int && t2 = Matrix -> Matrix
             | Dot when same && t1 = Matrix -> Double
+            | Div when t1 = Matrix && t2 = Int -> Matrix
             | _ -> raise (
           Failure ("illegal binary operator " ^
                          string_of_data_type t1 ^ " " ^ string_of_operator op ^ " " ^

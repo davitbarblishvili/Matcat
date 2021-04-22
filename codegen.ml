@@ -83,8 +83,11 @@ let translate (globals, functions) =
       let dot_matrix_t = L.function_type double_t [|matrx_t; matrx_t|] in
       let dot_matrix_f = L.declare_function "dot" dot_matrix_t the_module in
 
-      let scalar_matrix_t = L.function_type matrx_t [|i32_t; matrx_t|] in
+      let scalar_matrix_t = L.function_type matrx_t [|matrx_t; i32_t|] in
       let scalar_matrix_f = L.declare_function "scaleMatrix" scalar_matrix_t the_module in
+
+      let scalarDiv_matrix_t = L.function_type matrx_t [|matrx_t; i32_t|] in
+      let scalarDiv_matrix_f = L.declare_function "scalarDivMatrix" scalarDiv_matrix_t the_module in
 
       
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -166,6 +169,23 @@ let translate (globals, functions) =
           | A.Dot -> L.build_call dot_matrix_f [| e1'; e2' |] "dot" builder
           | _ -> raise (Failure "not implemented")  
           )
+
+       | SBinop (((A.Int,_)  as e1), op, ((A.Matrix,_) as e2))  when  op = A.Mult -> 
+          let e1' = expr builder e1
+          and e2' = expr builder e2 in
+          (match op with
+          | A.Mult -> L.build_call scalar_matrix_f [| e2'; e1' |] "scaleMatrix" builder
+          | _ -> raise (Failure "not implemented")    
+          )
+
+       | SBinop (((A.Matrix,_)  as e1), op, ((A.Int,_) as e2))  when op = A.Div -> 
+          let e1' = expr builder e1
+          and e2' = expr builder e2 in
+          (match op with
+          | A.Div -> L.build_call scalarDiv_matrix_f [| e1'; e2' |] "scalarDivMatrix" builder
+          | _ -> raise (Failure "not implemented")    
+          )
+
 
 
       | SBinop ((A.Double,_ ) as e1, op, e2) ->

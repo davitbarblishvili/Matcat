@@ -368,14 +368,29 @@ float dot(matrix* lhs, matrix* rhs) {
 matrix* scaleMatrix(matrix* input, int scalar) {
   int rows = input->num_rows;
   int cols= input->num_cols;
-  matrix *result = initMatrix(NULL, rows, cols);
+  matrix *result = initMatrix(NULL, cols, rows);
+  
   for(int i=0; i<rows; i++) {
-    for(int j=0; j<cols; j++) {
-        int product = input->matrixAddr[i][j] * scalar;
+    for(int j=0; j < cols; j++) {
+        float product = input->matrixAddr[i][j] * scalar;
         result->matrixAddr[i][j] = product;
     }
   }
 
+  return result;
+}
+
+matrix* scalarDivMatrix(matrix* input, int scalar) {
+  int rows = input->num_rows;
+  int cols= input->num_cols;
+  matrix *result = initMatrix(NULL, cols, rows);
+  
+  for(int i=0; i<rows; i++) {
+    for(int j=0; j < cols; j++) {
+        float product = input->matrixAddr[i][j] / scalar;
+        result->matrixAddr[i][j] = product;
+    }
+  }
   return result;
 }
 
