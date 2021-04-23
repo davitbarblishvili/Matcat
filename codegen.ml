@@ -101,6 +101,9 @@ let translate (globals, functions) =
       let isInvertible_matrix_t = L.function_type i1_t [|matrx_t|] in
       let isInvertible_matrix_f = L.declare_function "isInv" isInvertible_matrix_t the_module in
 
+      let access_matrix_t= L.function_type matrx_t[|matrx_t; i32_t; i32_t|] in
+      let access_matrix_f= L.declare_function "accessMatrix" access_matrix_t the_module in 
+
       
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
@@ -169,6 +172,12 @@ let translate (globals, functions) =
         in
         ignore(List.map (fun v -> L.build_call store_matrix_f [| m ; v |] "store_val" builder) contents'); m
       | SNoexpr     -> L.const_int i32_t 0
+      | SMatrixAccess(s, e1,e2)->
+          
+        let e1'=expr builder e1 
+        and e2'=expr builder e2 
+        and matrxPtr = L.build_load (lookup s) s builder in
+        L.build_call access_matrix_f [|matrxPtr; e1'; e2'|] "accessMatrix" builder
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop ((A.Matrix, _) as e1, op, e2)  when op = A.Add || op = A.Sub  || op = A.Dot || op = A.Mult -> 

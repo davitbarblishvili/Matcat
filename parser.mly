@@ -132,7 +132,8 @@ expr:
   | expr CR expr     { Binop($1,Cr,$3)        }
   | expr DOT expr    { Binop($1,Dot,$3)       }
   // | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
-   | LBRACK matrix_value RBRACK        { MatrixLit($2)}
+  | LBRACK matrix_value RBRACK        { MatrixLit($2)}
+  | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixAccess($1, $3, $6) }
   // | ID LBRACK expr RBRACK { VectorElmFromID($1,$3)}
   // | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElmFromID($1,$3,$6)}
   // | LBRACK vector_value SEMI RBRACK LBRACK expr RBRACK { VectorElm($2,$6)}
@@ -154,4 +155,9 @@ matrix_value:
   LBRACK args_opt RBRACK                   { [MatrixLit(List.rev $2)] }
 | LBRACK args_opt RBRACK COMMA matrix_value { MatrixLit(List.rev $2)::$5 }
 | LBRACK args_opt RBRACK matrix_value       { MatrixLit(List.rev $2)::$4 }
+
+/*
+access: 
+    LBRACK expr RBRACK { [$2] }
+  | access LBRACK expr RBRACK {$3 :: $1} */
 

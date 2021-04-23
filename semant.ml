@@ -56,7 +56,8 @@ module StringMap = Map.Make(String)
                                  ("det", [Matrix], Double);
                                  ("inv", [Matrix], Matrix);
                                  ("rref", [Matrix], Matrix);
-                                 ("isInv", [Matrix], Bool); ]
+                                 ("isInv", [Matrix], Bool); 
+                                 ("accessMatrix",[Matrix;Int;Int],Double)]
     in
   
     (* Add function name to symbol table *)
@@ -138,6 +139,8 @@ module StringMap = Map.Make(String)
           else if List.length d = 2 then (Matrix, SMatrixLit ( (List.map expr (flatten (List.tl d) l)), List.hd d, List.hd (List.tl d)))
           else if List.length d = 1 then (Matrix, SMatrixLit ( (List.map expr (flatten (List.tl d) l)), List.hd d, 1))
           else (Matrix, SMatrixLit ( (List.map expr l), 0,0))
+        | MatrixAccess(s,e1,e2)->let s_type=type_of_identifier s in 
+          (Matrix, SMatrixAccess(s, expr e1, expr e2))
         | Id s       -> (type_of_identifier s, SId s)
         | Assign(var, e) as ex -> 
             let lt = type_of_identifier var

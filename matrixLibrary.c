@@ -549,6 +549,15 @@ void isInv(matrix* input) {
 }
 
 
+matrix* accessMatrix(matrix* input, int row, int col){
+         matrix* result=initMatrix(NULL, 1, 1);
+         result->matrixAddr[0][0]=input->matrixAddr[row][col];
+         return result;
+
+
+}
+
+
 
 
 
