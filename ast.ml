@@ -98,7 +98,7 @@ let rec string_of_expr = function
     | Id(s) -> s
     | Assign(v, e) -> v ^ " = " ^ string_of_expr e
     | MatrixAccess(s,e1,e2)-> "MatrixAccess " ^ s ^ "[" ^ string_of_expr(e1) ^ "]" ^ "[" ^ string_of_expr(e2) ^ "]"
-    | MatrixAccess1D(s,e1)-> "MatrixAccess1D " ^ s ^ "[" ^ string_of_expr(e1) ^ "]"
+    | MatrixAccess1D(s,e1)-> "MatrixAccess1D " ^ s ^ "[" ^ string_of_expr(e1) ^ ",:]"
     | MatrixAccessCol(s,e1)-> "MatrixAccessCol " ^ s ^ "[:," ^ string_of_expr(e1) ^ "]"
     | Call(f, el) ->
         f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
@@ -120,15 +120,6 @@ let rec string_of_stmt = function
   (*variable declaration*)
 let string_of_vdecl (t, id,_) = string_of_data_type t ^ " " ^ id ^ ";\n"
 
-(*let string_of_fdecl fdecl =
-  "func " ^
-  fdecl.fname ^ "(" ^ String.concat ", " (List.map snd fdecl.formals) ^
-  ") "^
-  String.concat "" (List.map string_of_data_type fdecl.data_type) ^
-  "{\n" ^
-  String.concat "" (List.map string_of_vdecl fdecl.locals) ^
-  String.concat "" (List.map string_of_stmt fdecl.body) ^
-  "}\n" *)
 
   let string_of_fdecl fdecl =
     "func " ^

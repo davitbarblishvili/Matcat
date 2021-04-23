@@ -64,7 +64,7 @@ let rec string_of_sexpr (t, e) =
     | SId(s) -> s
     | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
     | SMatrixAccess(s,e1,e2)-> "SMatrixAccess " ^ s ^ "[" ^ string_of_sexpr(e1) ^ "]" ^ "[" ^ string_of_sexpr(e2) ^ "]"
-    | SMatrixAccess1D(s,e1)-> "SMatrixAccess1D " ^ s ^ "[" ^ string_of_sexpr(e1) ^ "]"
+    | SMatrixAccess1D(s,e1)-> "SMatrixAccess1D " ^ s ^ "[" ^ string_of_sexpr(e1) ^ ",:]"
     | SMatrixAccessCol(s,e1)-> "SMatrixAccessCol " ^ s ^ "[:," ^ string_of_sexpr(e1) ^ "]"
     | SCall(f, el) ->
         f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
