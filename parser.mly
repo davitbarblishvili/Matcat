@@ -134,6 +134,7 @@ expr:
   // | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
   | LBRACK matrix_value RBRACK        { MatrixLit($2)}
   | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixAccess($1, $3, $6) }
+  | ID LBRACK expr RBRACK { MatrixAccess1D($1, $3) }
   // | ID LBRACK expr RBRACK { VectorElmFromID($1,$3)}
   // | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElmFromID($1,$3,$6)}
   // | LBRACK vector_value SEMI RBRACK LBRACK expr RBRACK { VectorElm($2,$6)}

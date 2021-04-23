@@ -102,6 +102,8 @@ matrix* initMatrix(float* listOfValues, int num_cols, int num_rows) {
 }
 
 
+
+
 matrix* initMatrix_helper( int num_cols, int num_rows) {
     return initMatrix(NULL, num_cols, num_rows);
 }
@@ -550,10 +552,30 @@ void isInv(matrix* input) {
 
 
 matrix* accessMatrix(matrix* input, int row, int col){
-         matrix* result=initMatrix(NULL, 1, 1);
-         result->matrixAddr[0][0]=input->matrixAddr[row][col];
-         return result;
+  if(row >= input->num_rows || col >= input->num_cols){
+    die("Matrix index out of bound");
+  }
+  reverseMatrix(input);
+  matrix* result=initMatrix(NULL, 1, 1);
+  result->matrixAddr[0][0]=input->matrixAddr[row][col];
+  return result;
 
+
+}
+
+matrix* accessMatrix1D(matrix* input, int row){
+  if(row >= input->num_rows){
+    die("Matrix index out of bound");
+  }
+
+   matrix* result=initMatrix(NULL, input->num_cols, 1);
+  for(int i = row; i < row+1;i++){
+           for(int j = 0; j < input->num_cols; j++){
+             result->matrixAddr[0][j] =input->matrixAddr[i][j];
+
+           }
+         }        
+         return result;
 
 }
 

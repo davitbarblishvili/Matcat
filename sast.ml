@@ -20,6 +20,7 @@ and sx =
   | SAssign of string * sexpr
   | SCall of string * sexpr list
   | SMatrixAccess of string * sexpr * sexpr
+  | SMatrixAccess1D of string * sexpr
   | SNoexpr
 
   type sbind = data_type * string * sexpr
@@ -62,6 +63,7 @@ let rec string_of_sexpr (t, e) =
     | SId(s) -> s
     | SAssign(v, e) -> v ^ " = " ^ string_of_sexpr e
     | SMatrixAccess(s,e1,e2)-> " "
+    | SMatrixAccess1D(s,e1)-> "SMatrixAccess1D " ^ s ^ "[" ^ string_of_sexpr(e1) ^ "]"
     | SCall(f, el) ->
         f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
     | SNoexpr -> ""

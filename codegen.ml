@@ -104,6 +104,9 @@ let translate (globals, functions) =
       let access_matrix_t= L.function_type matrx_t[|matrx_t; i32_t; i32_t|] in
       let access_matrix_f= L.declare_function "accessMatrix" access_matrix_t the_module in 
 
+      let access_matrix1d_t= L.function_type matrx_t[|matrx_t; i32_t|] in
+      let access_matrix1d_f= L.declare_function "accessMatrix1D" access_matrix1d_t the_module in 
+
       
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
@@ -178,6 +181,10 @@ let translate (globals, functions) =
         and e2'=expr builder e2 
         and matrxPtr = L.build_load (lookup s) s builder in
         L.build_call access_matrix_f [|matrxPtr; e1'; e2'|] "accessMatrix" builder
+        | SMatrixAccess1D(s, e1)->
+          let e1'=expr builder e1 
+          and matrxPtr = L.build_load (lookup s) s builder in
+          L.build_call access_matrix1d_f [|matrxPtr; e1'|] "accessMatrix1D" builder
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'
       | SBinop ((A.Matrix, _) as e1, op, e2)  when op = A.Add || op = A.Sub  || op = A.Dot || op = A.Mult -> 
@@ -222,9 +229,6 @@ let translate (globals, functions) =
           | A.Div -> L.build_call scalarDivDouble_matrix_f [| e1'; e2' |] "scalarDivDoubleMatrix" builder
           | _ -> raise (Failure "not implemented")    
           )
-
-
-
 
       | SBinop ((A.Double,_ ) as e1, op, e2) ->
         let e1' = expr builder e1
