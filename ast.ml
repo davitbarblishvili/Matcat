@@ -26,6 +26,7 @@ type expr =
 | Call of string * expr list
 | MatrixAccess of string * expr * expr
 | MatrixAccess1D of string * expr
+| MatrixAccessCol of string * expr
 | Noexpr
 
 type bind = data_type * string * expr
@@ -96,8 +97,9 @@ let rec string_of_expr = function
     | MatrixLit(l) ->  "matrixLit[" ^ String.concat ", " (List.map string_of_expr l) ^ "]"
     | Id(s) -> s
     | Assign(v, e) -> v ^ " = " ^ string_of_expr e
-    | MatrixAccess(s,e1,e2)-> ""
+    | MatrixAccess(s,e1,e2)-> "MatrixAccess " ^ s ^ "[" ^ string_of_expr(e1) ^ "]" ^ "[" ^ string_of_expr(e2) ^ "]"
     | MatrixAccess1D(s,e1)-> "MatrixAccess1D " ^ s ^ "[" ^ string_of_expr(e1) ^ "]"
+    | MatrixAccessCol(s,e1)-> "MatrixAccessCol " ^ s ^ "[:," ^ string_of_expr(e1) ^ "]"
     | Call(f, el) ->
         f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
     | Noexpr -> ""

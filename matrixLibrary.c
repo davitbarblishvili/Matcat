@@ -579,6 +579,25 @@ matrix* accessMatrix1D(matrix* input, int row){
 
 }
 
+matrix* accessMatrixCol(matrix* input, int col){
+  if(col >= input->num_cols){
+    die("Matrix index out of bound");
+  }
+  
+   matrix* result=initMatrix(NULL, input->num_rows, 1);
+  for(int i = 0; i < input->num_rows;i++){
+           for(int j = col; j < col+1; j++){
+             result->matrixAddr[0][i] =input->matrixAddr[i][j];
+
+           }
+         }        
+         reverseMatrix(result);
+         return result;
+
+}
+
+
+
 
 
 

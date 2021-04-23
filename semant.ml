@@ -58,7 +58,8 @@ module StringMap = Map.Make(String)
                                  ("rref", [Matrix], Matrix);
                                  ("isInv", [Matrix], Bool); 
                                  ("accessMatrix",[Matrix;Int;Int],Double);
-                                 ("accessMatrix1D",[Matrix;Int],Matrix)]
+                                 ("accessMatrix1D",[Matrix;Int],Matrix);
+                                 ("accessMatrixCol",[Matrix;Int],Matrix)]
     in
   
     (* Add function name to symbol table *)
@@ -145,6 +146,8 @@ module StringMap = Map.Make(String)
 
         | MatrixAccess1D(s,e1)->let s_type=type_of_identifier s in 
           (Matrix, SMatrixAccess1D(s, expr e1))
+        | MatrixAccessCol(s,e1)->let s_type=type_of_identifier s in 
+          (Matrix, SMatrixAccessCol(s, expr e1))
         | Id s       -> (type_of_identifier s, SId s)
         | Assign(var, e) as ex -> 
             let lt = type_of_identifier var

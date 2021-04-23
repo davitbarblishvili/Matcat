@@ -22,6 +22,7 @@ rule token = parse
 | '*'      { TIMES }
 | '/'      { DIVIDE }
 | '='      { ASSIGN }
+| ':'      { COLON }
 | "cr"     { CR }
 | "dot"    { DOT }
 | "=="     { EQ }
