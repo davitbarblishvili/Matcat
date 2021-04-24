@@ -31,6 +31,7 @@ type expr =
 | MatrixAccessCol of string * expr
 | MatrixPower of string * expr
 | Noexpr
+| Noassign
 
 type global = bind * expr
 
@@ -109,7 +110,8 @@ let rec string_of_expr = function
     | MatrixPower(s,e1) -> "MatrixPower " ^ s ^"^" ^ string_of_expr(e1)
     | Call(f, el) ->
         f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-    | Noexpr -> ""
+    | Noexpr -> "(Noexpr)"
+    | Noassign -> "(Noassign)"
 
 let rec string_of_stmt = function
     Block(stmts) ->
@@ -124,7 +126,7 @@ let rec string_of_stmt = function
     string_of_expr e3  ^ ") " ^ string_of_stmt s
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
   | Vdecl(b, e) -> match e with
-      Noexpr -> string_of_bind b ^ ";\n"
+      Noassign -> string_of_bind b ^ ";\n"
     | _      -> string_of_bind b ^" = "^ string_of_expr e ^ ";\n"
 
   (*variable declaration*)

@@ -223,6 +223,7 @@ module StringMap = Map.Make(String)
         | DoubleLit l -> (Double, SDoubleLit l)
         | BoolLit l  -> (Bool, SBoolLit l)
         | Noexpr     -> (Void, SNoexpr)
+        | Noassign     -> (Void, SNoassign)
         | CharLit l ->(Char, SCharLit l)        (* TODO: review *)
         | StringLit l ->(String, SStringLit l)  (* TODO: review *)
         | MatrixLit l -> 
