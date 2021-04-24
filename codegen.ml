@@ -110,6 +110,9 @@ let translate (globals, functions) =
       let access_matrixcol_t= L.function_type matrx_t[|matrx_t; i32_t|] in
       let access_matrixcol_f= L.declare_function "accessMatrixCol" access_matrixcol_t the_module in 
 
+      let access_matrixdiagonal_t= L.function_type matrx_t[|matrx_t|] in
+      let access_matrixdiagonal_f= L.declare_function "print_diagonal" access_matrixdiagonal_t the_module in 
+
       
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
@@ -309,7 +312,10 @@ let translate (globals, functions) =
          L.build_call rref_matrix_f [| (expr builder e) |] "rref" builder
 
         | SCall ("isInv", [e]) ->
-         L.build_call isInvertible_matrix_f [| (expr builder e) |] "rref" builder
+         L.build_call isInvertible_matrix_f [| (expr builder e) |] "isInv" builder
+
+        | SCall ("print_diagonal", [e]) ->
+         L.build_call access_matrixdiagonal_f [| (expr builder e) |] "print_diagonal" builder
 
 
         | SCall (f, args) ->

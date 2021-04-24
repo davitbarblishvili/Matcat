@@ -59,7 +59,8 @@ module StringMap = Map.Make(String)
                                  ("isInv", [Matrix], Bool); 
                                  ("accessMatrix",[Matrix;Int;Int],Double);
                                  ("accessMatrix1D",[Matrix;Int],Matrix);
-                                 ("accessMatrixCol",[Matrix;Int],Matrix)]
+                                 ("accessMatrixCol",[Matrix;Int],Matrix);
+                                 ("print_diagonal",[Matrix],Matrix)]
     in
   
     (* Add function name to symbol table *)

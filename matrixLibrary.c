@@ -24,6 +24,8 @@ double inverse(matrix*, int);
 matrix* cofactor(matrix*, float);
 double det(matrix*);
 matrix* rref_helper(matrix*, double);
+matrix* accessMatrixDgl(matrix*);
+
 int debug = 0;
 
 
@@ -595,6 +597,32 @@ matrix* accessMatrixCol(matrix* input, int col){
          return result;
 
 }
+
+
+matrix* print_diagonal(matrix* input){
+  if(input->num_cols != input->num_rows){
+    die("entry should be squared matrix");
+  }
+  reverseMatrix(input);
+  
+  matrix* result=initMatrix(NULL, input->num_rows, 1);
+  for(int i = 0; i < input->num_rows;i++){
+           for(int j = 0; j < input->num_cols; j++){
+
+             if(i == j){
+                result->matrixAddr[0][i] =input->matrixAddr[i][j];
+
+             }
+           }
+         }        
+         reverseMatrix(result);
+         printMatrix(result);
+         return result;
+
+}
+
+
+
 
 
 
