@@ -3,7 +3,9 @@ func main() int
     matrix a; 
     matrix c; 
     a = [[1,2],[4,5]];
-    inv(a);
+    c = inv(a);
+
+    printm(c);
     
     return 0;
 

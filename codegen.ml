@@ -80,7 +80,7 @@ let translate (globals, functions) =
       let det_matrix_f = L.declare_function "det" det_matrix_t the_module in
 
       let inv_matrix_t = L.function_type matrx_t [|matrx_t|] in
-      let inv_matrix_f = L.declare_function "inv" transpose_matrix_t the_module in
+      let inv_matrix_f = L.declare_function "inv" inv_matrix_t the_module in
 
       let dot_matrix_t = L.function_type double_t [|matrx_t; matrx_t|] in
       let dot_matrix_f = L.declare_function "dot" dot_matrix_t the_module in
@@ -113,7 +113,7 @@ let translate (globals, functions) =
       let access_matrixcol_f= L.declare_function "accessMatrixCol" access_matrixcol_t the_module in 
 
       let access_matrixdiagonal_t= L.function_type matrx_t[|matrx_t|] in
-      let access_matrixdiagonal_f= L.declare_function "print_diagonal" access_matrixdiagonal_t the_module in 
+      let access_matrixdiagonal_f= L.declare_function "get_diagonal" access_matrixdiagonal_t the_module in 
 
       let power_matrix_t= L.function_type matrx_t[|matrx_t; i32_t|] in
       let power_matrix_f= L.declare_function "power_matrix" power_matrix_t the_module in 
@@ -174,7 +174,6 @@ let translate (globals, functions) =
 	      SIntLit i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SDoubleLit l -> L.const_float_of_string double_t l
-      | SCharLit l  -> L.const_int i8_t (int_of_char l)
       | SStringLit s -> L.build_global_stringptr s "tmp" builder
       | SId s -> L.build_load (lookup s symbol_table) s builder
       | SMatrixLit (contents, rows, cols) ->
@@ -201,11 +200,6 @@ let translate (globals, functions) =
           let e1'=expr builder e1 symbol_table
           and matrxPtr = L.build_load (lookup s symbol_table) s builder in
           L.build_call access_matrix1d_f [|matrxPtr; e1'|] "accessMatrix1D" builder
-
-      | SMatrixAccess1D(s, e1)->
-          let e1'=expr builder e1 symbol_table
-          and matrxPtr = L.build_load (lookup s symbol_table) s builder in
-          L.build_call access_matrix1d_f [|matrxPtr; e1'|] "accessMatrix1D" builder  
 
       | SMatrixPower(s, e1)->
         let e1'=expr builder e1 symbol_table
@@ -278,6 +272,8 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_fcmp L.Fcmp.Ole
         | A.Greater -> L.build_fcmp L.Fcmp.Ogt
         | A.Geq     -> L.build_fcmp L.Fcmp.Oge
+        | A.Cr      -> raise (Failure "cr can be used only for matrices")
+        | A.Dot     -> raise (Failure "cr can be used only for matrices")
         | A.And | A.Or ->
             raise (Failure "internal error: semant should have rejected and/or on float")
         ) e1' e2' "tmp" builder
@@ -297,6 +293,8 @@ let translate (globals, functions) =
         | A.Leq     -> L.build_icmp L.Icmp.Sle
         | A.Greater -> L.build_icmp L.Icmp.Sgt
         | A.Geq     -> L.build_icmp L.Icmp.Sge
+        | A.Cr      -> raise (Failure "cr can be used only for matrices")
+        | A.Dot     -> raise (Failure "cr can be used only for matrices")
          ) e1' e2' "tmp" builder
       
         | SUnop(op, ((t, _) as e)) ->
@@ -335,8 +333,8 @@ let translate (globals, functions) =
         | SCall ("isInv", [e]) ->
          L.build_call isInvertible_matrix_f [| (expr builder e symbol_table) |] "isInv" builder
 
-        | SCall ("print_diagonal", [e]) ->
-         L.build_call access_matrixdiagonal_f [| (expr builder e symbol_table) |] "print_diagonal" builder
+        | SCall ("get_diagonal", [e]) ->
+         L.build_call access_matrixdiagonal_f [| (expr builder e symbol_table) |] "get_diagonal" builder
 
 
         | SCall (f, args) ->

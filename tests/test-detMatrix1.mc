@@ -1,7 +1,10 @@
 func main() int {
-    matrix a; 
+    matrix a;
+    double d; 
     a = [[1,2],[5,2]];
-    det(a);
+    d = det(a);
+
+    printd(d);
 
     return 0;
 }

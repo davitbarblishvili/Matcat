@@ -7,14 +7,13 @@ open Ast
 %token SEMI LPAREN RPAREN LBRACE RBRACE COMMA PLUS MINUS TIMES DIVIDE ASSIGN RBRACK LBRACK COLON CIRCU
 %token STRUCT
 %token NOT EQ NEQ LT LEQ GT GEQ TRUE FALSE AND OR
-%token RETURN IF ELSE FOR WHILE INT STRING BOOL DOUBLE CHAR VOID
+%token RETURN IF ELSE FOR WHILE INT STRING BOOL DOUBLE VOID
 /* added */
-%token CR DOT MATRIX VECTOR FUNC 
+%token CR DOT MATRIX FUNC 
 %token <int> INTLIT
 %token <bool> BLIT
 %token <string> ID DOUBLELIT
 %token <string> STRINGLIT
-%token <char> CHARLIT
 %token EOF
 
 %start program
@@ -63,15 +62,13 @@ formal_list:
     typ ID                   { [($1,$2)]     }
   | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
-/* added matrix and vector in types */
+/* added matrix in types */
 typ:
     INT     { Int    }
   | BOOL    { Bool   }
   | DOUBLE  { Double }
-  | CHAR    { Char   }
   | VOID    { Void   }	
   | MATRIX  { Matrix }
-  | VECTOR  { Vector }
   | STRING  { String }
 
 stmt_list:
@@ -101,7 +98,6 @@ expr:
   | STRINGLIT        { StringLit($1)          }
   | TRUE             { BoolLit(true)          }
   | FALSE            { BoolLit(false)         }
-  | CHARLIT          { CharLit($1)            }
   | ID               { Id($1)                 }
   | expr PLUS   expr { Binop($1, Add,   $3)   }
   | expr MINUS  expr { Binop($1, Sub,   $3)   }
@@ -120,23 +116,14 @@ expr:
   | ID ASSIGN expr   { Assign($1, $3)         }
   | ID LPAREN args_opt RPAREN { Call($1, $3)  }
   | LPAREN expr RPAREN { $2                   }
-  /* added */
-  // | LBRACK args_opt RBRACK              {SeqLit($2)}
   | expr CR expr     { Binop($1,Cr,$3)        }
   | expr DOT expr    { Binop($1,Dot,$3)       }
-  // | LBRACK vector_value SEMI RBRACK { VectorLit($2)}
   | LBRACK matrix_value RBRACK        { MatrixLit($2)}
   | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixAccess($1, $3, $6) }
   | ID LBRACK expr COMMA COLON RBRACK { MatrixAccess1D($1, $3) }
   | ID LBRACK COLON COMMA expr RBRACK { MatrixAccessCol($1, $5) }
   | ID CIRCU expr                     { MatrixPower($1, $3)}
-  // | ID LBRACK expr RBRACK { VectorElmFromID($1,$3)}
-  // | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElmFromID($1,$3,$6)}
-  // | LBRACK vector_value SEMI RBRACK LBRACK expr RBRACK { VectorElm($2,$6)}
-  // | LT matrix_value SEMI GT LBRACK expr RBRACK LBRACK expr RBRACK { MatrixElm($2,$6)}   //matrix[x][y]
-  /* //Or this:  We will finalize this later.
-  | LT matrix_value SEMI GT LBRACK args_opt RBRACK { MatrixElm($2,$6)}                  //matrix[x,y]
-  */
+
 
 global:
   |typ ID SEMI         { (($1,$2),Noexpr) }
@@ -156,8 +143,4 @@ matrix_value:
 | LBRACK args_opt RBRACK COMMA matrix_value { MatrixLit(List.rev $2)::$5 }
 | LBRACK args_opt RBRACK matrix_value       { MatrixLit(List.rev $2)::$4 }
 
-/*
-access: 
-    LBRACK expr RBRACK { [$2] }
-  | access LBRACK expr RBRACK {$3 :: $1} */
 

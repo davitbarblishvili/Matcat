@@ -6,7 +6,8 @@ func main() int{
     a = [[1,2,3]];
     b = [[2,3,4]];
 
-    a dot b; 
+    c = a dot b; 
+    printd(c);
    
 
     return 0;

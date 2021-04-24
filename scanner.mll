@@ -44,7 +44,6 @@ rule token = parse
 | "int"    { INT }
 | "bool"   { BOOL }
 | "matrix" {MATRIX}
-| "vector" {VECTOR}
 | "double"  { DOUBLE }
 | "void"   { VOID }
 | "true"   { BLIT(true)  }

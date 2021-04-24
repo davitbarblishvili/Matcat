@@ -39,13 +39,7 @@ module StringMap = Map.Make(String)
   
       in
   
-      let check_identifier_assign s = 
-          if StringMap.mem s global_map then
-            let (_, t2) = StringMap.find s global_map in
-            if t2 = Void then raise (Failure ("uninialized identifier " ^ s))
-            else t2
-          else raise (Failure ("undeclared identifier " ^ s))
-      in
+    
   
       (* Return a semantically-checked expression, i.e., with a type *)
       let rec expr = function
@@ -53,7 +47,6 @@ module StringMap = Map.Make(String)
     | DoubleLit l -> (Double, SDoubleLit l)
     | BoolLit l  -> (Bool, SBoolLit l)
     | Noexpr     -> (Void, SNoexpr)
-    | CharLit l -> (Char, SCharLit l)
     | StringLit l -> (String, SStringLit l)
     (* TODO: CHECK MATRIX LITERAL IN GLOBAL*)
     | Unop(op, e) as ex -> 
@@ -118,7 +111,7 @@ module StringMap = Map.Make(String)
     (* Collect function declarations for built-in functions: no bodies *)
     let built_in_decls = 
       let add_bind map (name, ty,ret) = StringMap.add name {
-        data_type = Void;
+        data_type = ret;
         fname = name; 
         formals =
       (let rec create_ty_list = (function
@@ -140,7 +133,7 @@ module StringMap = Map.Make(String)
                                  ("accessMatrix",[Matrix;Int;Int],Double);
                                  ("accessMatrix1D",[Matrix;Int],Matrix);
                                  ("accessMatrixCol",[Matrix;Int],Matrix);
-                                 ("print_diagonal",[Matrix],Matrix);]
+                                 ("get_diagonal",[Matrix],Matrix);]
     in
   
     (* Add function name to symbol table *)
@@ -224,8 +217,7 @@ module StringMap = Map.Make(String)
         | BoolLit l  -> (Bool, SBoolLit l)
         | Noexpr     -> (Void, SNoexpr)
         | Noassign     -> (Void, SNoassign)
-        | CharLit l ->(Char, SCharLit l)        (* TODO: review *)
-        | StringLit l ->(String, SStringLit l)  (* TODO: review *)
+        | StringLit l ->(String, SStringLit l) 
         | MatrixLit l -> 
           let d = get_dims (MatrixLit l) in
           let rec all_match = function
@@ -241,15 +233,15 @@ module StringMap = Map.Make(String)
           else if List.length d = 2 then (Matrix, SMatrixLit ( (List.map expr_mapper (flatten (List.tl d) l)), List.hd d, List.hd (List.tl d)))
           else if List.length d = 1 then (Matrix, SMatrixLit ( (List.map expr_mapper (flatten (List.tl d) l)), List.hd d, 1))
           else (Matrix, SMatrixLit ( (List.map expr_mapper l ), 0,0))
-        | MatrixAccess(s,e1,e2)->let s_type=type_of_identifier s symbols in 
+        | MatrixAccess(s,e1,e2)->
           (Matrix, SMatrixAccess(s, expr e1 symbols, expr e2 symbols))
 
-        | MatrixAccess1D(s,e1)->let s_type=type_of_identifier s symbols in 
+        | MatrixAccess1D(s,e1)->
           (Matrix, SMatrixAccess1D(s, expr e1 symbols))
-        | MatrixAccessCol(s,e1)->let s_type=type_of_identifier s symbols in 
+        | MatrixAccessCol(s,e1)->
           (Matrix, SMatrixAccessCol(s, expr e1 symbols))
 
-        | MatrixPower(s,e1)->let s_type=type_of_identifier s symbols in 
+        | MatrixPower(s,e1)->
           (Matrix, SMatrixPower(s, expr e1 symbols))
 
         | Id s       -> (type_of_identifier s symbols, SId s)

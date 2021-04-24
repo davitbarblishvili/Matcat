@@ -14,7 +14,6 @@ and sx =
   | SDoubleLit of string
   | SStringLit of string
   | SBoolLit of bool
-  | SCharLit of char
   | SMatrixLit of sexpr list * int * int 
   | SId of string
   | SAssign of string * sexpr
@@ -58,7 +57,6 @@ let rec string_of_sexpr (t, e) =
     | SStringLit(l) -> l
     | SBoolLit(true) -> "true"
     | SBoolLit(false) -> "false"
-    | SCharLit(l) -> Char.escaped l
     | SMatrixLit(l, r, c) -> "rows: " ^ string_of_int r ^ ", cols: " ^ 
                   string_of_int c ^ " : [" ^ String.concat ", " (List.map string_of_sexpr l) ^ "]"
     | SId(s) -> s

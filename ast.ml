@@ -10,7 +10,7 @@ type operator = Add | Sub | Mult | Div | Equal
 
 type unary_operator = Not | Neg 
 
-type data_type = Int | Char | Double | String | Void | Bool | Matrix | Vector
+type data_type = Int | Double | String | Void | Bool | Matrix
 
 type bind = data_type * string
 
@@ -21,7 +21,6 @@ type expr =
 | DoubleLit of string
 | StringLit of string
 | BoolLit of bool
-| CharLit of char
 | MatrixLit of expr list
 | Id of string
 | Assign of string * expr
@@ -82,9 +81,7 @@ let string_of_data_type = function
   | Bool -> "bool"
   | Double -> "double"
   | String -> "string"
-  | Char -> "char"
   | Matrix -> "matrix"
-  | Vector -> "vector"
   | Void -> "void"
 
 (* Pretty-printing functions *)
@@ -100,7 +97,6 @@ let rec string_of_expr = function
     | StringLit(l) -> l
     | BoolLit(true) -> "true"   
     | BoolLit(false) -> "false"
-    | CharLit(l) -> Char.escaped l
     | MatrixLit(l) ->  "matrixLit[" ^ String.concat ", " (List.map string_of_expr l) ^ "]"
     | Id(s) -> s
     | Assign(v, e) -> v ^ " = " ^ string_of_expr e

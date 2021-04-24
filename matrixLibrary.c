@@ -231,10 +231,9 @@ matrix* inv(matrix* input){
   int cols = input->num_cols; 
   double d = determinant(input,rows);
   if(d == 0){
-    die("\nInverse of Entered Matrix is not possible\n");
+    die("\nInverse of the matrix is not possible\n");
   }
    input = (cofactor(input, rows));
-   printMatrix(input);
    return input;
 
 }
@@ -309,11 +308,10 @@ double det(matrix* input) {
   int rows = input->num_rows;
   int cols = input->num_cols; 
   if(rows != cols){
-    die("Finding a determinant of non-square matrix is not possible");
+    die("Finding a determinant of non-square matrix is not possible in our universe");
   }
   
   double deter = determinant(input, cols); 
-  printf("%.2f\n",deter);
   return deter;
 
 
@@ -324,7 +322,8 @@ double det(matrix* input) {
 double determinant(matrix* input, int k)
 {
 reverseMatrix(input);
-float s = 1, det = 0;
+float s = 1;
+double det = 0;
 int rows = input->num_rows;
 int cols = input->num_cols; 
 matrix *result = initMatrix(NULL,rows , cols);
@@ -368,12 +367,12 @@ if (k == 1)
     return det;
 }
 
-float dot(matrix* lhs, matrix* rhs) {
+double dot(matrix* lhs, matrix* rhs) {
     //check to make sure matrices are the same size
     if (lhs->num_rows != rhs->num_rows || lhs->num_cols != rhs->num_cols) {
         die("Matrices are not the same size!");
     } 
-    float dotPr = 0.0;
+    double dotPr = 0.0;
     //once we know that matrices are same size, we can compute result
     for (int i=0; i < lhs->num_rows; i++)
     {
@@ -382,7 +381,6 @@ float dot(matrix* lhs, matrix* rhs) {
           dotPr += lhs->matrixAddr[i][j] * rhs->matrixAddr[i][j];
         }
     }
-    printf("%.2f\n",dotPr);
     return dotPr;
 }
 
@@ -562,9 +560,6 @@ void isInv(matrix* input) {
     printf("%s\n","This matrix is not invertible");
   }else{
     printf("%s\n","This matrix is invertible");
-    printf("%s\n","calculating inverse...");
-    reverseMatrix(input);
-    inv(input);
   }
 }
 
@@ -615,7 +610,7 @@ matrix* accessMatrixCol(matrix* input, int col){
 }
 
 
-matrix* print_diagonal(matrix* input){
+matrix* get_diagonal(matrix* input){
   if(input->num_cols != input->num_rows){
     die("entry should be squared matrix");
   }
@@ -631,7 +626,6 @@ matrix* print_diagonal(matrix* input){
            }
          }        
          reverseMatrix(result);
-         printMatrix(result);
          return result;
 
 }
