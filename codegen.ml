@@ -113,6 +113,9 @@ let translate (globals, functions) =
       let access_matrixdiagonal_t= L.function_type matrx_t[|matrx_t|] in
       let access_matrixdiagonal_f= L.declare_function "print_diagonal" access_matrixdiagonal_t the_module in 
 
+      let power_matrix_t= L.function_type matrx_t[|matrx_t; i32_t|] in
+      let power_matrix_f= L.declare_function "power_matrix" power_matrix_t the_module in 
+
       
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
@@ -188,15 +191,27 @@ let translate (globals, functions) =
         and matrxPtr = L.build_load (lookup s) s builder in
         L.build_call access_matrix_f [|matrxPtr; e1'; e2'|] "accessMatrix" builder
 
-        | SMatrixAccess1D(s, e1)->
+      | SMatrixAccess1D(s, e1)->
           let e1'=expr builder e1 
           and matrxPtr = L.build_load (lookup s) s builder in
           L.build_call access_matrix1d_f [|matrxPtr; e1'|] "accessMatrix1D" builder
 
+      | SMatrixAccess1D(s, e1)->
+          let e1'=expr builder e1 
+          and matrxPtr = L.build_load (lookup s) s builder in
+          L.build_call access_matrix1d_f [|matrxPtr; e1'|] "accessMatrix1D" builder  
+
+      | SMatrixPower(s, e1)->
+        let e1'=expr builder e1 
+        and matrxPtr = L.build_load (lookup s) s builder in
+        L.build_call power_matrix_f [|matrxPtr; e1'|] "power_matrix" builder
+      
       | SMatrixAccessCol(s, e1)->
         let e1'=expr builder e1 
         and matrxPtr = L.build_load (lookup s) s builder in
         L.build_call access_matrixcol_f [|matrxPtr; e1'|] "accessMatrixCol" builder
+
+
 
       | SAssign (s, e) -> let e' = expr builder e in
                           ignore(L.build_store e' (lookup s) builder); e'

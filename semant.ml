@@ -60,7 +60,7 @@ module StringMap = Map.Make(String)
                                  ("accessMatrix",[Matrix;Int;Int],Double);
                                  ("accessMatrix1D",[Matrix;Int],Matrix);
                                  ("accessMatrixCol",[Matrix;Int],Matrix);
-                                 ("print_diagonal",[Matrix],Matrix)]
+                                 ("print_diagonal",[Matrix],Matrix);]
     in
   
     (* Add function name to symbol table *)
@@ -149,6 +149,10 @@ module StringMap = Map.Make(String)
           (Matrix, SMatrixAccess1D(s, expr e1))
         | MatrixAccessCol(s,e1)->let s_type=type_of_identifier s in 
           (Matrix, SMatrixAccessCol(s, expr e1))
+
+        | MatrixPower(s,e1)->let s_type=type_of_identifier s in 
+          (Matrix, SMatrixPower(s, expr e1))
+
         | Id s       -> (type_of_identifier s, SId s)
         | Assign(var, e) as ex -> 
             let lt = type_of_identifier var

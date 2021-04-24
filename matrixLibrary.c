@@ -25,6 +25,7 @@ matrix* cofactor(matrix*, float);
 double det(matrix*);
 matrix* rref_helper(matrix*, double);
 matrix* accessMatrixDgl(matrix*);
+matrix* power_matrix_helper(matrix*, int);
 
 int debug = 0;
 
@@ -192,8 +193,20 @@ matrix* matrxMult(matrix* lhs, matrix* rhs) {
     die("matrix mult size mismatch");
   }
 
-  reverseMatrix(lhs);
-  reverseMatrix(rhs);
+  matrix* originalMatrix =initMatrix(NULL, lhs->num_rows, lhs->num_cols);
+
+  for(int i = 0; i < lhs->num_rows;i++){
+      for(int j = 0; j < lhs->num_cols; j++){
+        originalMatrix->matrixAddr[i][j] =lhs->matrixAddr[i][j];
+           }
+         } 
+
+
+    reverseMatrix(originalMatrix);
+    reverseMatrix(rhs);
+
+ 
+  
   int rows_lhs = lhs->num_rows;
   int cols_lhs = lhs->num_cols; 
   int rows_rhs = rhs->num_rows;
@@ -203,15 +216,17 @@ matrix* matrxMult(matrix* lhs, matrix* rhs) {
   for(int i=0; i<rows_lhs; i++) {
     for(int j=0; j<cols_rhs; j++) {
       for (int k = 0; k < cols_rhs; k++){
-        result->matrixAddr[i][j] = result->matrixAddr[i][j] + (lhs->matrixAddr[i][k] * rhs->matrixAddr[k][j]);
+        result->matrixAddr[i][j] = result->matrixAddr[i][j] + (originalMatrix->matrixAddr[i][k] * rhs->matrixAddr[k][j]);
       }    
     }
   }
+  
+
   reverseMatrix(result);
   return result;
 }
 
-void inv(matrix* input){
+matrix* inv(matrix* input){
   int rows = input->num_rows;
   int cols = input->num_cols; 
   double d = determinant(input,rows);
@@ -220,6 +235,7 @@ void inv(matrix* input){
   }
    input = (cofactor(input, rows));
    printMatrix(input);
+   return input;
 
 }
 
@@ -611,7 +627,6 @@ matrix* print_diagonal(matrix* input){
 
              if(i == j){
                 result->matrixAddr[0][i] =input->matrixAddr[i][j];
-
              }
            }
          }        
@@ -621,7 +636,69 @@ matrix* print_diagonal(matrix* input){
 
 }
 
+matrix* power_matrix(matrix* input, int power){
+  if(input->num_rows == input->num_cols){
+      if(power < 0 ){
+      matrix* result=initMatrix(NULL, input->num_rows, input->num_cols);
+      result = inv(input);
+      int newPower = abs(power);
+      result = power_matrix_helper(result, newPower);
+      printMatrix(result);
+      return result;
 
+    }
+    if( power == 0){
+      matrix* identityMatrix =initMatrix(NULL, input->num_rows, input->num_cols);
+      for(int i = 0; i < input->num_rows;i++){
+            for(int j = 0; j < input->num_cols; j++){
+              if(i == j){
+                identityMatrix->matrixAddr[i][j] = 1;
+              }else{
+                identityMatrix->matrixAddr[i][j] = 0;
+              }
+            }
+      }
+      reverseMatrix(identityMatrix);
+      printMatrix(identityMatrix);
+      return identityMatrix;
+    }
+  if(power > 0){
+     printMatrix(power_matrix_helper(input,power));
+     return input;
+
+  }
+  }else{
+    die("I need squared matrix to continue calculations");
+  }
+  return input;
+}
+
+
+
+matrix* power_matrix_helper(matrix* input, int power){
+  if(power == 1){
+    return input;
+  }
+  matrix* tempMatrix =initMatrix(NULL, input->num_rows, input->num_cols);
+  matrix* originalMatrix =initMatrix(NULL, input->num_rows, input->num_cols);
+
+  for(int i = 0; i < input->num_rows;i++){
+      for(int j = 0; j < input->num_cols; j++){
+        originalMatrix->matrixAddr[i][j] =input->matrixAddr[i][j];
+           }
+         } 
+        
+  while(power > 1){
+    power--;
+    tempMatrix = matrxMult(input, originalMatrix);
+    input = tempMatrix;
+    
+  }
+  
+
+  return input;
+
+}
 
 
 
