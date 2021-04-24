@@ -358,5 +358,5 @@ module StringMap = Map.Make(String)
     SBlock(sl) -> sl
         | _ -> raise (Failure ("internal error: block didn't become a block?"))
       }
-    in (globals, List.map check_function functions)
+    in (glob, List.map check_function functions)
   

@@ -128,7 +128,7 @@ let rec string_of_stmt = function
     | _      -> string_of_bind b ^" = "^ string_of_expr e ^ ";\n"
 
   (*variable declaration*)
-let string_of_vdecl (t, id,_) = string_of_data_type t ^ " " ^ id ^ ";\n"
+let string_of_vdecl (t, id) = string_of_data_type t ^ " " ^ id ^ ";\n"
 
 let string_of_formals formals = List.map string_of_bind formals
 
@@ -140,9 +140,10 @@ let string_of_fdecl fdecl =
   "}\n"
 
 
-let string_of_global (b, e) = match e with
-  Noexpr -> string_of_bind b ^ ";\n"
-  | _      -> string_of_bind b ^" = "^ string_of_expr e ^ ";\n"
+let string_of_global (b, e) = 
+  if string_of_expr e = "" 
+  then string_of_bind b ^ ";\n"
+  else string_of_bind b ^" = "^ string_of_expr e ^ ";\n"
 
 
 let string_of_program (vars, funcs) =
