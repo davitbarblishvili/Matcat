@@ -14,7 +14,6 @@ let translate (globals, functions) =
   let llmem = L.MemoryBuffer.of_file "matrixLibrary.bc" in
   let llm = Llvm_bitreader.parse_bitcode context llmem in
 
-
   (* Create the LLVM compilation module into which
      we will generate code *)
   let the_module = L.create_module context "MatCat" in
@@ -39,13 +38,16 @@ let translate (globals, functions) =
     | A.Matrix -> matrx_t
   in
 
-  let global_vars : L.llvalue StringMap.t =
-    let global_var m (t, n, _) =
-      let init = match t with
-          A.Double-> L.const_float (ltype_of_typ t) 0.0
-        | _ -> L.const_int (ltype_of_typ t) 0
-      in StringMap.add n (L.define_global n init the_module) m in
-    List.fold_left global_var StringMap.empty globals in
+  let g_var_suffix =  "" in
+  let ip_t       = L.pointer_type i8_t in
+  let init t = match t with 
+          | A.String -> L.const_pointer_null ip_t
+          | _     -> L.const_int (ltype_of_typ t) 0
+  in
+
+  let global_vars = 
+  let global_var m (t, n) = StringMap.add n (L.define_global (n ^ g_var_suffix) (init t) the_module) m in
+  List.fold_left global_var StringMap.empty globals in
 
   let printf_t : L.lltype =
       L.var_arg_function_type i32_t [| L.pointer_type i8_t |] in
@@ -116,12 +118,13 @@ let translate (globals, functions) =
       let power_matrix_t= L.function_type matrx_t[|matrx_t; i32_t|] in
       let power_matrix_f= L.declare_function "power_matrix" power_matrix_t the_module in 
 
+  let to_imp str = raise (Failure ("Not yet implemented: " ^ str)) in
       
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
       let name = fdecl.sfname
       and formal_types = 
-	Array.of_list (List.map (fun (t,_,_) -> ltype_of_typ t) fdecl.sformals)
+	Array.of_list (List.map (fun (t,_) -> ltype_of_typ t) fdecl.sformals)
       (* Returning mutiple values  *)
       in let ftype = L.function_type (ltype_of_typ fdecl.sdata_type) formal_types in
       StringMap.add name (L.define_function name ftype the_module, fdecl) m in
@@ -135,89 +138,92 @@ let translate (globals, functions) =
     let int_format_str = L.build_global_stringptr "%d\n" "fmt" builder
     and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder 
     and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
+
+    (*
     and double_format_str = L.build_global_stringptr "%g\n" "fmt" builder
     and matrix_format_str = L.build_global_stringptr "%g " "fmt" builder
-    and return_format_str = L.build_global_stringptr "\n" "fmt" builder in
-
+    and return_format_str = L.build_global_stringptr "\n" "fmt" builder
+    *)
+    in
+    let add_local (m, tmp_builder) (t, n) = 
+      let local_var = L.build_alloca (ltype_of_typ t) n tmp_builder
+      in (StringMap.add n local_var m, tmp_builder)
+    in
     let local_vars =
       let add_formal m (t, n) p =
         L.set_value_name n p;
 	let local = L.build_alloca (ltype_of_typ t) n builder in
         ignore (L.build_store p local builder);
 	StringMap.add n local m
-
-      (* Allocate space for any locally declared variables and add the
-       * resulting registers to our map *)
-      and add_local m (t, n) =
-  let local_var = L.build_alloca (ltype_of_typ t) n builder
-	in StringMap.add n local_var m
       in
 
-      let sformals = List.map (fun (tp, vName, _) -> (tp, vName)) fdecl.sformals in
-      let slocals= List.map (fun (tp, vName, _) -> (tp, vName)) fdecl.slocals in
-      let formals = List.fold_left2 add_formal StringMap.empty sformals
+      let formals = List.fold_left2 add_formal StringMap.empty fdecl.sformals
           (Array.to_list (L.params the_function)) in
-      List.fold_left add_local formals slocals
+      List.fold_left add_local (formals, builder) fdecl.slocals
     in
 
+    let scoped_vars = [fst local_vars; global_vars] in
 
-    let lookup n = try StringMap.find n local_vars
-    with Not_found -> StringMap.find n global_vars
+    let rec lookup n var_list = match var_list with 
+                           hd::tl -> (try StringMap.find n hd with Not_found -> lookup n tl)
+                         | _ -> raise (Failure("wrong variable tables"))
     in
 
   
-    let rec expr builder ((_, e) : sexpr) = match e with
+    let rec expr builder ((tp, e) : sexpr) symbol_table = match e with
 	      SIntLit i  -> L.const_int i32_t i
       | SBoolLit b  -> L.const_int i1_t (if b then 1 else 0)
       | SDoubleLit l -> L.const_float_of_string double_t l
       | SCharLit l  -> L.const_int i8_t (int_of_char l)
       | SStringLit s -> L.build_global_stringptr s "tmp" builder
-      | SId s       -> L.build_load (lookup s) s builder
+      | SId s -> L.build_load (lookup s symbol_table) s builder
       | SMatrixLit (contents, rows, cols) ->
         let rec expr_list = function
           [] -> []
-          | hd::tl -> expr builder hd::expr_list tl
+          | hd::tl -> expr builder hd symbol_table::expr_list tl 
         in
         let contents' = expr_list contents
         in
         let m = L.build_call matrix_init_f [| L.const_int i32_t cols; L.const_int i32_t rows |] "matrix_init" builder
         in
+        
         ignore(List.map (fun v -> L.build_call store_matrix_f [| m ; v |] "store_val" builder) contents'); m
       | SNoexpr     -> L.const_int i32_t 0
+      | SNoassign   -> init tp
       | SMatrixAccess(s, e1,e2)->
           
-        let e1'=expr builder e1 
-        and e2'=expr builder e2 
-        and matrxPtr = L.build_load (lookup s) s builder in
+        let e1'=expr builder e1 symbol_table
+        and e2'=expr builder e2 symbol_table
+        and matrxPtr = L.build_load (lookup s symbol_table) s builder in
         L.build_call access_matrix_f [|matrxPtr; e1'; e2'|] "accessMatrix" builder
 
       | SMatrixAccess1D(s, e1)->
-          let e1'=expr builder e1 
-          and matrxPtr = L.build_load (lookup s) s builder in
+          let e1'=expr builder e1 symbol_table
+          and matrxPtr = L.build_load (lookup s symbol_table) s builder in
           L.build_call access_matrix1d_f [|matrxPtr; e1'|] "accessMatrix1D" builder
 
       | SMatrixAccess1D(s, e1)->
-          let e1'=expr builder e1 
-          and matrxPtr = L.build_load (lookup s) s builder in
+          let e1'=expr builder e1 symbol_table
+          and matrxPtr = L.build_load (lookup s symbol_table) s builder in
           L.build_call access_matrix1d_f [|matrxPtr; e1'|] "accessMatrix1D" builder  
 
       | SMatrixPower(s, e1)->
-        let e1'=expr builder e1 
-        and matrxPtr = L.build_load (lookup s) s builder in
+        let e1'=expr builder e1 symbol_table
+        and matrxPtr = L.build_load (lookup s symbol_table) s builder in
         L.build_call power_matrix_f [|matrxPtr; e1'|] "power_matrix" builder
       
       | SMatrixAccessCol(s, e1)->
-        let e1'=expr builder e1 
-        and matrxPtr = L.build_load (lookup s) s builder in
+        let e1'=expr builder e1 symbol_table
+        and matrxPtr = L.build_load (lookup s symbol_table) s builder in
         L.build_call access_matrixcol_f [|matrxPtr; e1'|] "accessMatrixCol" builder
 
 
 
-      | SAssign (s, e) -> let e' = expr builder e in
-                          ignore(L.build_store e' (lookup s) builder); e'
+      | SAssign (s, e) -> let e' = expr builder e symbol_table in
+                          ignore(L.build_store e' (lookup s symbol_table) builder); e'
       | SBinop ((A.Matrix, _) as e1, op, e2)  when op = A.Add || op = A.Sub  || op = A.Dot || op = A.Mult -> 
-          let e1' = expr builder e1
-          and e2' = expr builder e2 in
+          let e1' = expr builder e1 symbol_table
+          and e2' = expr builder e2 symbol_table in
           (match op with
             A.Add  -> L.build_call add_matrix_f [| e1'; e2' |] "matrxAdd" builder
           | A.Sub  -> L.build_call sub_matrix_f [| e1'; e2' |] "matrxSub" builder
@@ -227,40 +233,40 @@ let translate (globals, functions) =
           )
 
        | SBinop (((A.Int,_)  as e1), op, ((A.Matrix,_) as e2))  when  op = A.Mult -> 
-          let e1' = expr builder e1
-          and e2' = expr builder e2 in
+          let e1' = expr builder e1 symbol_table
+          and e2' = expr builder e2 symbol_table in
           (match op with
           | A.Mult -> L.build_call scalar_matrix_f [| e2'; e1' |] "scaleMatrix" builder
           | _ -> raise (Failure "not implemented")    
           )
 
          | SBinop (((A.Double,_)  as e1), op, ((A.Matrix,_) as e2))  when  op = A.Mult -> 
-          let e1' = expr builder e1
-          and e2' = expr builder e2 in
+          let e1' = expr builder e1 symbol_table
+          and e2' = expr builder e2 symbol_table in
           (match op with
           | A.Mult -> L.build_call scalarDouble_matrix_f [| e2'; e1' |] "scaleMatrixDouble" builder
           | _ -> raise (Failure "not implemented")    
           )
 
        | SBinop (((A.Matrix,_)  as e1), op, ((A.Int,_) as e2))  when op = A.Div -> 
-          let e1' = expr builder e1
-          and e2' = expr builder e2 in
+          let e1' = expr builder e1 symbol_table
+          and e2' = expr builder e2 symbol_table in
           (match op with
           | A.Div -> L.build_call scalarDiv_matrix_f [| e1'; e2' |] "scalarDivMatrix" builder
           | _ -> raise (Failure "not implemented")    
           )
 
           | SBinop (((A.Matrix,_)  as e1), op, ((A.Double,_) as e2))  when op = A.Div -> 
-          let e1' = expr builder e1
-          and e2' = expr builder e2 in
+          let e1' = expr builder e1 symbol_table
+          and e2' = expr builder e2 symbol_table in
           (match op with
           | A.Div -> L.build_call scalarDivDouble_matrix_f [| e1'; e2' |] "scalarDivDoubleMatrix" builder
           | _ -> raise (Failure "not implemented")    
           )
 
       | SBinop ((A.Double,_ ) as e1, op, e2) ->
-        let e1' = expr builder e1
-        and e2' = expr builder e2 in
+        let e1' = expr builder e1 symbol_table
+        and e2' = expr builder e2 symbol_table in
         (match op with
           A.Add     -> L.build_fadd
         | A.Sub     -> L.build_fsub
@@ -276,8 +282,8 @@ let translate (globals, functions) =
             raise (Failure "internal error: semant should have rejected and/or on float")
         ) e1' e2' "tmp" builder
       | SBinop (e1, op, e2) ->
-        let e1' = expr builder e1
-        and e2' = expr builder e2 in
+        let e1' = expr builder e1 symbol_table
+        and e2' = expr builder e2 symbol_table in
         (match op with
           A.Add     -> L.build_add
         | A.Sub     -> L.build_sub
@@ -294,48 +300,49 @@ let translate (globals, functions) =
          ) e1' e2' "tmp" builder
       
         | SUnop(op, ((t, _) as e)) ->
-          let e' = expr builder e in
+          let e' = expr builder e symbol_table in
 	        (match op with
 	        A.Neg when t = A.Double -> L.build_fneg
 	      | A.Neg                  -> L.build_neg
         | A.Not                  -> L.build_not) e' "tmp" builder
         | SCall ("print", [e]) | SCall ("printb", [e]) ->
-          L.build_call printf_func [| int_format_str ; (expr builder e) |] 
+          L.build_call printf_func [| int_format_str ; (expr builder e symbol_table) |] 
           "printf" builder    
 
         | SCall ("printStr", [e]) ->
-          L.build_call printf_func [| string_format_str ; (expr builder e) |]
+          L.build_call printf_func [| string_format_str ; (expr builder e symbol_table) |]
           "printf" builder
 
         | SCall ("printd",[e]) ->
-          L.build_call printf_func [| float_format_str ; (expr builder e) |]
+          L.build_call printf_func [| float_format_str ; (expr builder e symbol_table) |]
           "printf" builder
 
         | SCall ("printm", [e]) ->
-          L.build_call printMatrix_f [| (expr builder e) |] "printm" builder
+          L.build_call printMatrix_f [| (expr builder e symbol_table) |] "printm" builder
 
         | SCall ("transpose", [e]) ->
-        L.build_call transpose_matrix_f [| (expr builder e) |] "transpose" builder
+        L.build_call transpose_matrix_f [| (expr builder e symbol_table) |] "transpose" builder
 
         | SCall ("inv", [e]) ->
-        L.build_call inv_matrix_f [| (expr builder e) |] "inv" builder
+        L.build_call inv_matrix_f [| (expr builder e symbol_table) |] "inv" builder
 
         | SCall ("det", [e]) ->
-         L.build_call det_matrix_f [| (expr builder e) |] "det" builder
+         L.build_call det_matrix_f [| (expr builder e symbol_table) |] "det" builder
 
         | SCall ("rref", [e]) ->
-         L.build_call rref_matrix_f [| (expr builder e) |] "rref" builder
+         L.build_call rref_matrix_f [| (expr builder e symbol_table) |] "rref" builder
 
         | SCall ("isInv", [e]) ->
-         L.build_call isInvertible_matrix_f [| (expr builder e) |] "isInv" builder
+         L.build_call isInvertible_matrix_f [| (expr builder e symbol_table) |] "isInv" builder
 
         | SCall ("print_diagonal", [e]) ->
-         L.build_call access_matrixdiagonal_f [| (expr builder e) |] "print_diagonal" builder
+         L.build_call access_matrixdiagonal_f [| (expr builder e symbol_table) |] "print_diagonal" builder
 
 
         | SCall (f, args) ->
           let (fdef, fdecl) = StringMap.find f function_decls in
-	    let llargs = List.rev (List.map (expr builder) (List.rev args)) in
+      let llargs_helper b st x = expr b x st in 
+	    let llargs = List.rev (List.map (llargs_helper builder symbol_table) (List.rev args)) in
 	    let result = (match fdecl.sdata_type with
                         A.Void -> ""
                       | _ -> f ^ "_result") in
@@ -350,61 +357,63 @@ let translate (globals, functions) =
        the statement's successor (i.e., the next instruction will be built
        after the one generated by this call) *)
 
-       let rec stmt builder m = function
-       SBlock sl ->                       
-                   let helper (bldr, map) = stmt bldr map in
-                   let (b, _) = List.fold_left helper (builder, m) sl in
-                   (b, m)
-           | SExpr e -> ignore(expr builder e); (builder, m)
-           | SReturn e -> ignore(match fdecl.sdata_type with
-                                   (* Special "return nothing" instr *)
-                                   A.Void -> L.build_ret_void builder
-                                   (* Build return statement *)
-                                 | _ -> L.build_ret (expr builder e) builder );
-                          (builder, m)
+       let rec stmt (builder, symbol_table, pbuilder) = function
+             SBlock sl -> List.fold_left stmt (builder, StringMap.empty :: symbol_table, pbuilder) sl
+           | SExpr e -> let _ = expr builder e symbol_table in (builder, symbol_table, pbuilder)
+           | SVdecl (e1, e2) -> 
+              let (tp, s) = 
+              e1 in let (symbol_table2, _) = 
+                add_local (List.hd symbol_table, pbuilder) (tp, s) in
+                  let symbol_table3 = (symbol_table2 :: (List.tl symbol_table)) in
+
+                  let _ = match e2 with
+                    (A.Void, SNoassign) -> init tp
+                  | _ -> expr builder (tp, SAssign(s, e2)) symbol_table3
+           in (builder, symbol_table3, pbuilder)
+           | SReturn e -> let _ = match fdecl.sdata_type with
+                              A.Int -> L.build_ret (expr builder e symbol_table) builder 
+                            | _ -> to_imp (A.string_of_data_type fdecl.sdata_type)
+                     in (builder, symbol_table, pbuilder)
            | SIf (predicate, then_stmt, else_stmt) ->
-              let bool_val = expr builder predicate in
-        let merge_bb = L.append_block context "merge" the_function in
-              let build_br_merge = L.build_br merge_bb in (* partial function *)
-     
-        let then_bb = L.append_block context "then" the_function in
-        let (b', _) = stmt (L.builder_at_end context then_bb) m then_stmt in
-        add_terminal b'
-        build_br_merge;
+              let bool_val = expr builder predicate symbol_table in
+              let merge_bb = L.append_block context "merge" the_function in
+                let build_br_merge = L.build_br merge_bb in (* partial function *)
+              let then_bb = L.append_block context "then" the_function in
+                    let (b', _, _) = (stmt ((L.builder_at_end context then_bb), symbol_table, pbuilder) then_stmt) in 
+                let () = add_terminal b' build_br_merge in
      
         let else_bb = L.append_block context "else" the_function in
-        let (b', _) = stmt (L.builder_at_end context else_bb) m else_stmt in
-        add_terminal b'
-          build_br_merge;
-     
-        ignore(L.build_cond_br bool_val then_bb else_bb builder);
-        (L.builder_at_end context merge_bb, m)
+        let (b', _, _) = (stmt ((L.builder_at_end context else_bb), symbol_table, pbuilder) else_stmt) in
+        let () = add_terminal b' build_br_merge in
+
+        let _ = L.build_cond_br bool_val then_bb else_bb builder in
+        (L.builder_at_end context merge_bb, symbol_table, L.builder_at_end context merge_bb)
      
            | SWhile (predicate, body) ->
          let pred_bb = L.append_block context "while" the_function in
          ignore(L.build_br pred_bb builder);
      
          let body_bb = L.append_block context "while_body" the_function in
-         let (b', _) = stmt (L.builder_at_end context body_bb) m body in
+         let (b', _, _) = (stmt ((L.builder_at_end context body_bb), symbol_table, pbuilder) body) in
          add_terminal b'
            (L.build_br pred_bb);
      
          let pred_builder = L.builder_at_end context pred_bb in
-         let bool_val = expr pred_builder predicate in
+         let bool_val = expr pred_builder predicate symbol_table in
      
          let merge_bb = L.append_block context "merge" the_function in
          ignore(L.build_cond_br bool_val body_bb merge_bb pred_builder);
-         (L.builder_at_end context merge_bb, m)
+         (L.builder_at_end context merge_bb, symbol_table, L.builder_at_end context merge_bb)
 
          
      
            (* Implement for loops as while loops *)
-           | SFor (e1, e2, e3, body) -> stmt builder m
+           | SFor (e1, e2, e3, body) -> stmt (builder, symbol_table, pbuilder)
            ( SBlock [SExpr e1 ; SWhile (e2, SBlock [body ; SExpr e3]) ] )
          in
      
          (* Build the code for each statement in the function *)
-         let (builder, _) = stmt builder local_vars (SBlock fdecl.sbody) in
+         let (builder, _, _) = (stmt (builder, scoped_vars, builder)) (SBlock fdecl.sbody) in
      
          (* Add a return if the last block falls off the end *)
          add_terminal builder (match fdecl.sdata_type with

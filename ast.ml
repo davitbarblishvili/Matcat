@@ -12,6 +12,8 @@ type unary_operator = Not | Neg
 
 type data_type = Int | Char | Double | String | Void | Bool | Matrix | Vector
 
+type bind = data_type * string
+
 type expr =
   IntLit of int
 | Binop of expr * operator * expr
@@ -29,8 +31,9 @@ type expr =
 | MatrixAccessCol of string * expr
 | MatrixPower of string * expr
 | Noexpr
+| Noassign
 
-type bind = data_type * string * expr
+type global = bind * expr
 
 type stmt =
   Block of stmt list
@@ -39,6 +42,7 @@ type stmt =
 | If of expr * stmt * stmt
 | For of expr * expr * expr * stmt
 | While of expr * stmt
+| Vdecl of bind * expr
 
 
 type func_decl = {
@@ -49,7 +53,7 @@ type func_decl = {
     body : stmt list;
   }
 
-type program = bind list * func_decl list
+type program = global list * func_decl list
 
 
 let string_of_operator = function
@@ -84,6 +88,8 @@ let string_of_data_type = function
   | Void -> "void"
 
 (* Pretty-printing functions *)
+let string_of_bind bind =
+  string_of_data_type (fst bind) ^ " " ^ (snd bind)
 
 let rec string_of_expr = function
       IntLit (l) -> string_of_int l
@@ -104,7 +110,8 @@ let rec string_of_expr = function
     | MatrixPower(s,e1) -> "MatrixPower " ^ s ^"^" ^ string_of_expr(e1)
     | Call(f, el) ->
         f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"
-    | Noexpr -> ""
+    | Noexpr -> "(Noexpr)"
+    | Noassign -> "(Noassign)"
 
 let rec string_of_stmt = function
     Block(stmts) ->
@@ -118,23 +125,31 @@ let rec string_of_stmt = function
     "for (" ^ string_of_expr e1  ^ " ; " ^ string_of_expr e2 ^ " ; " ^
     string_of_expr e3  ^ ") " ^ string_of_stmt s
   | While(e, s) -> "while (" ^ string_of_expr e ^ ") " ^ string_of_stmt s
+  | Vdecl(b, e) -> match e with
+      Noassign -> string_of_bind b ^ ";\n"
+    | _      -> string_of_bind b ^" = "^ string_of_expr e ^ ";\n"
 
   (*variable declaration*)
-let string_of_vdecl (t, id,_) = string_of_data_type t ^ " " ^ id ^ ";\n"
+let string_of_vdecl (t, id) = string_of_data_type t ^ " " ^ id ^ ";\n"
+
+let string_of_formals formals = List.map string_of_bind formals
+
+let string_of_fdecl fdecl =
+  "func " ^
+  fdecl.fname ^ "(" ^ String.concat ", " (string_of_formals fdecl.formals) ^
+  ")" ^ string_of_data_type fdecl.data_type ^ "\n{\n" ^
+  String.concat "" (List.map string_of_stmt fdecl.body) ^
+  "}\n"
 
 
-  let string_of_fdecl fdecl =
-    "func " ^
-    fdecl.fname ^ "(" ^ String.concat ", " (List.map (fun (_, vName, _) -> vName) fdecl.formals) ^
-    ")" ^ string_of_data_type fdecl.data_type ^ "\n{\n" ^
-    String.concat "" (List.map string_of_vdecl fdecl.locals) ^
-    String.concat "" (List.map string_of_stmt fdecl.body) ^
-    "}\n"
+let string_of_global (b, e) = 
+  if string_of_expr e = "" 
+  then string_of_bind b ^ ";\n"
+  else string_of_bind b ^" = "^ string_of_expr e ^ ";\n"
 
 
 let string_of_program (vars, funcs) =
-  let f' = List.rev funcs in
-  String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_fdecl f')
+  String.concat "" (List.map string_of_global vars) ^ "\n" ^
+  String.concat "\n" (List.map string_of_fdecl funcs)
 
   
