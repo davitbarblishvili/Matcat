@@ -38,29 +38,30 @@ open Ast
 
 program:
   decls EOF { $1 }
-  
+
 decls:
    /* nothing */ { ([], [])               }
- | decls vdecl { (($2 :: fst $1), snd $1) }
+ | decls global { (($2 :: fst $1), snd $1) }
  | decls fdecl { (fst $1, ($2 :: snd $1)) }
 
 fdecl:
     /* if this is func decl, how do we write that we can return as much var as we want */
 	  /* added FUNC, also types which will be what types it returns */
-   FUNC ID LPAREN formals_opt RPAREN typ LBRACE vdecl_list stmt_list RBRACE 
+   FUNC ID LPAREN formals_opt RPAREN typ LBRACE stmt_list RBRACE 
      { { 
 	 fname = $2;
 	 formals = List.rev $4;
 	 data_type =$6;
-	 locals = List.rev $8;
-	 body = List.rev $9 } }
+	 locals = [];
+	 body = List.rev $8 } }
+
 formals_opt:
     /* nothing */ { [] }
   | formal_list   { $1 }
 
 formal_list:
-    typ ID                   { [($1,$2,Noexpr)]     }
-  | formal_list COMMA typ ID { ($3,$4,Noexpr) :: $1 }
+    typ ID                   { [($1,$2)]     }
+  | formal_list COMMA typ ID { ($3,$4) :: $1 }
 
 /* added matrix and vector in types */
 typ:
@@ -73,15 +74,6 @@ typ:
   | VECTOR  { Vector }
   | STRING  { String }
 
-
-vdecl_list:
-    /* nothing */    { [] }
-  | vdecl_list vdecl { $2 :: $1 }
-
-vdecl:
-   typ ID SEMI { ($1, $2, Noexpr) }
-  |typ ID ASSIGN expr SEMI { ($1, $2, Assign($2,$4))}
-
 stmt_list:
     /* nothing */  { [] }
   | stmt_list stmt { $2 :: $1 }
@@ -89,21 +81,22 @@ stmt_list:
 stmt:
     expr SEMI                               { Expr $1               }
   | RETURN expr_opt SEMI                    { Return $2             }
-  /* not sure about this one it seems smth like { }  */
   | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
   | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
   | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7)        }
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
                                             { For($3, $5, $7, $9)   }
   | WHILE LPAREN expr RPAREN stmt           { While($3, $5)         }
+  | typ ID SEMI                             { Vdecl(($1, $2), Noexpr)   }
+  | typ ID ASSIGN expr SEMI                 { Vdecl(($1, $2), $4)       }
   
 expr_opt:
     /* nothing */ { Noexpr }
   | expr          { $1 }  
 
 expr:
-    INTLIT          { IntLit($1)            }
-  | DOUBLELIT	       { DoubleLit($1)      }
+    INTLIT           { IntLit($1)             }
+  | DOUBLELIT	       { DoubleLit($1)          }
   | BLIT             { BoolLit($1)            }
   | STRINGLIT        { StringLit($1)          }
   | TRUE             { BoolLit(true)          }
@@ -144,6 +137,10 @@ expr:
   /* //Or this:  We will finalize this later.
   | LT matrix_value SEMI GT LBRACK args_opt RBRACK { MatrixElm($2,$6)}                  //matrix[x,y]
   */
+
+global:
+  |typ ID SEMI         { (($1,$2),Noexpr) }
+  |typ ID ASSIGN expr SEMI { (($1,$2),$4) }
 
 args_opt:
     /* nothing */ { [] }

@@ -25,9 +25,6 @@ and sx =
   | SMatrixPower of string * sexpr
   | SNoexpr
 
-  type sbind = data_type * string * sexpr
-
-
 type sstmt =
     SBlock of sstmt list
   | SExpr of sexpr
@@ -35,6 +32,7 @@ type sstmt =
   | SIf of sexpr * sstmt * sstmt
   | SFor of sexpr * sexpr * sexpr * sstmt
   | SWhile of sexpr * sstmt
+  | SVdecl of bind * sexpr
 
 type sfunc_decl = {
     sfname : string;
@@ -44,7 +42,7 @@ type sfunc_decl = {
     sbody : sstmt list;
   }
 
-type sprogram = bind list * sfunc_decl list
+type sprogram = global list * sfunc_decl list
 
 
 (* Pretty-printing functions *)
@@ -71,7 +69,8 @@ let rec string_of_sexpr (t, e) =
     | SCall(f, el) ->
         f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
     | SNoexpr -> ""
-            ) ^ ")"		
+  )
+  ^ ")"		
 
 let rec string_of_sstmt = function
     SBlock(stmts) ->
@@ -85,22 +84,21 @@ let rec string_of_sstmt = function
     "for (" ^ string_of_sexpr e1  ^ " ; " ^ string_of_sexpr e2 ^ " ; " ^
     string_of_sexpr e3  ^ ") " ^ string_of_sstmt s
   | SWhile(e, s) -> "while (" ^ string_of_sexpr e ^ ") " ^ string_of_sstmt s
+  | SVdecl(b, e) -> 
+    if string_of_sexpr e = "" then
+        string_of_data_type (fst b) ^ " " ^ (snd b) ^ ";\n" 
+    else string_of_data_type (fst b) ^ " " ^ (snd b) ^" = "^ string_of_sexpr e ^ ";\n"
 
 
 
     let string_of_sfdecl fdecl =
       "func " ^
-      fdecl.sfname ^ "(" ^ String.concat ", " (List.map (fun (_, vName, _) -> vName) fdecl.sformals) ^
+      fdecl.sfname ^ "(" ^ String.concat ", " (List.map snd fdecl.sformals) ^
       ")" ^ string_of_data_type fdecl.sdata_type ^ "\n{\n" ^
-      String.concat "" (List.map string_of_vdecl fdecl.slocals) ^
       String.concat "" (List.map string_of_sstmt fdecl.sbody) ^
       "}\n"    
 
-  
-  
-
 let string_of_sprogram (vars, funcs) =
-  let f' = List.rev funcs in
   String.concat "" (List.map string_of_vdecl vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_sfdecl f')
+  String.concat "\n" (List.map string_of_sfdecl funcs)
   
