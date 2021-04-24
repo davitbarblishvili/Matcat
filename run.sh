@@ -33,7 +33,7 @@ basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
 Run $MATCAT $1 >$basename.ll &&
 Run "$LLC" "-relocation-model=pic" "${basename}.ll" ">" "${basename}.s" &&
-Run "$CC" "-o" "${basename}.exe" "${basename}.s" &&
+Run "$CC" "-o" "${basename}.exe" "${basename}.s" "matrixLibrary.o" "-lm"&&
 Run ./$basename.exe
 
 rm -f "$basename.exe"
