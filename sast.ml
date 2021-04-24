@@ -24,6 +24,7 @@ and sx =
   | SMatrixAccessCol of string * sexpr
   | SMatrixPower of string * sexpr
   | SNoexpr
+  | SNoassign
 
 type sstmt =
     SBlock of sstmt list
