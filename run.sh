@@ -32,7 +32,7 @@ reffile=`echo $1 | sed 's/.mc$//'`
 basedir="`echo $1 | sed 's/\/[^\/]*$//'`/."
 
 Run $MATCAT $1 >$basename.ll &&
-Run "$LLC" "-relocation-model=pic" "${basename}.ll" ">" "${basename}.s" &&
+Run "$LLC" "-relocation-model=pic" "${basename}.ll" &&
 Run "$CC" "-o" "${basename}.exe" "${basename}.s" "matrixLibrary.o" "-lm"&&
 Run ./$basename.exe
 
