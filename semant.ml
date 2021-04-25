@@ -134,7 +134,8 @@ module StringMap = Map.Make(String)
                                  ("accessMatrix1D",[Matrix;Int],Matrix);
                                  ("accessMatrixCol",[Matrix;Int],Matrix);
                                  ("get_diagonal",[Matrix],Matrix);
-                                 ("rotate90",[Matrix],Void)]
+                                 ("rotate90",[Matrix],Void);
+                                 ("check_symmetry",[Matrix],Int)]
     in
   
     (* Add function name to symbol table *)

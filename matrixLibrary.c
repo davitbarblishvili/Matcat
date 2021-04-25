@@ -697,6 +697,31 @@ void rotate90(matrix* input)
 }
 
 
+int check_symmetry(matrix* input){
+  int isSymmetric;
+  matrix* transposeM = initMatrix(NULL,input->num_cols, input->num_rows);
+  transposeM = transpose(input);
+
+  isSymmetric = 1;
+    for(int row=0; row < input->num_rows && isSymmetric; row++)
+    {
+        for(int col=0; col < input->num_cols; col++)
+        {
+            /* If matrix A is not equal to its transpose */
+            if(input->matrixAddr[row][col] != transposeM->matrixAddr[row][col])
+            {
+                isSymmetric = 0;
+                break;
+            }
+        }
+    }
+
+    return isSymmetric;
+
+
+}
+
+
 
 
 
