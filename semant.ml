@@ -201,12 +201,12 @@ module StringMap = Map.Make(String)
 
       let rec get_dims = function
       MatrixLit l -> List.length l :: get_dims (List.hd l)
-    | _ -> []
+     | _ -> []
       in
 
       let rec flatten d = function
       [] -> []
-      | MatrixLit hd::tl -> if List.length hd != List.hd d then raise (Failure("Invalid dims")) else List.append (flatten (List.tl d) hd) (flatten d tl)
+      | MatrixLit hd::tl -> if List.length hd != List.hd d then raise (Failure("Invalid dims")) else List.append (List.rev (flatten ((List.tl) d) hd)) (flatten d tl)
       | a -> a
       in
   

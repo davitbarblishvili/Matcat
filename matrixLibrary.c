@@ -51,7 +51,7 @@ void printMatrix(matrix* input) {
     printf("\n");
     for(int i = 0; i<row; i++) {
        printf("[");
-        for(int j=col-1; j >= 0; j--) {
+        for(int j=0; j < col; j++) {
             printf("%.2f ", input->matrixAddr[i][j]);
         }
         printf("]");
@@ -165,7 +165,6 @@ matrix* matrxSub(matrix* lhs, matrix* rhs) {
 
 
 matrix* transpose(matrix* input) {
-    reverseMatrix(input);
     int rows = input->num_cols;
     int cols = input->num_rows;
 
@@ -181,7 +180,6 @@ matrix* transpose(matrix* input) {
     input->num_rows = rows;
     input->num_cols = cols;
     input->matrixAddr = matrixValues;
-    reverseMatrix(input);
     return input;
 }
 
@@ -199,14 +197,7 @@ matrix* matrxMult(matrix* lhs, matrix* rhs) {
       for(int j = 0; j < lhs->num_cols; j++){
         originalMatrix->matrixAddr[i][j] =lhs->matrixAddr[i][j];
            }
-         } 
-
-
-    reverseMatrix(originalMatrix);
-    reverseMatrix(rhs);
-
- 
-  
+         }   
   int rows_lhs = lhs->num_rows;
   int cols_lhs = lhs->num_cols; 
   int rows_rhs = rhs->num_rows;
@@ -221,8 +212,6 @@ matrix* matrxMult(matrix* lhs, matrix* rhs) {
     }
   }
   
-
-  reverseMatrix(result);
   return result;
 }
 
@@ -267,7 +256,6 @@ matrix* cofactor(matrix* input, float f)
             }
         }
       }
-      reverseMatrix(b);
       fac->matrixAddr[q][p] = pow(-1, q + p) * determinant(b, f - 1);
     }
   }
@@ -279,7 +267,6 @@ matrix* inverseHelper(matrix* input, matrix* fac, float r)
 {
   int i, j;
   float d;
-  reverseMatrix(input);
   matrix *inverse = initMatrix(NULL,(int)r ,(int) r);
   matrix *b = initMatrix(NULL,(int)r ,(int) r);
   
@@ -299,7 +286,6 @@ matrix* inverseHelper(matrix* input, matrix* fac, float r)
         inverse->matrixAddr[i][j] = b->matrixAddr[i][j] / d;
         }
     }
-   reverseMatrix(inverse);
    return inverse;
 }
 
@@ -321,7 +307,6 @@ double det(matrix* input) {
 // source code: https://www.sanfoundry.com/c-program-find-inverse-matrix/
 double determinant(matrix* input, int k)
 {
-reverseMatrix(input);
 float s = 1;
 double det = 0;
 int rows = input->num_rows;
@@ -358,7 +343,7 @@ if (k == 1)
                    }
                }
              }
-          reverseMatrix(result);
+        
           det = det + s * (input->matrixAddr[0][c] * determinant(result, k - 1));
           s = -1 * s;
           }
@@ -549,7 +534,6 @@ matrix* rref_helper(matrix* oMatrix, double tolerance)
 }
 
 void rref(matrix* input) {
-  reverseMatrix(input);
   printMatrix(rref_helper(input,1e-6));
 
 }
@@ -568,7 +552,6 @@ matrix* accessMatrix(matrix* input, int row, int col){
   if(row >= input->num_rows || col >= input->num_cols){
     die("Matrix index out of bound");
   }
-  reverseMatrix(input);
   matrix* result=initMatrix(NULL, 1, 1);
   result->matrixAddr[0][0]=input->matrixAddr[row][col];
   return result;
@@ -604,7 +587,7 @@ matrix* accessMatrixCol(matrix* input, int col){
 
            }
          }        
-         reverseMatrix(result);
+      
          return result;
 
 }
@@ -614,8 +597,6 @@ matrix* get_diagonal(matrix* input){
   if(input->num_cols != input->num_rows){
     die("entry should be squared matrix");
   }
-  reverseMatrix(input);
-  
   matrix* result=initMatrix(NULL, input->num_rows, 1);
   for(int i = 0; i < input->num_rows;i++){
            for(int j = 0; j < input->num_cols; j++){
@@ -625,7 +606,7 @@ matrix* get_diagonal(matrix* input){
              }
            }
          }        
-         reverseMatrix(result);
+  
          return result;
 
 }
@@ -637,7 +618,6 @@ matrix* power_matrix(matrix* input, int power){
       result = inv(input);
       int newPower = abs(power);
       result = power_matrix_helper(result, newPower);
-      printMatrix(result);
       return result;
 
     }
@@ -652,8 +632,7 @@ matrix* power_matrix(matrix* input, int power){
               }
             }
       }
-      reverseMatrix(identityMatrix);
-      printMatrix(identityMatrix);
+
       return identityMatrix;
     }
   if(power > 0){

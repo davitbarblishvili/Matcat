@@ -186,7 +186,7 @@ let translate (globals, functions) =
         let m = L.build_call matrix_init_f [| L.const_int i32_t cols; L.const_int i32_t rows |] "matrix_init" builder
         in
         
-        ignore(List.map (fun v -> L.build_call store_matrix_f [| m ; v |] "store_val" builder) contents'); m
+        ignore(List.map (fun v -> L.build_call store_matrix_f [| m ; v |] "storeEntries" builder) contents'); m
       | SNoexpr     -> L.const_int i32_t 0
       | SNoassign   -> init tp
       | SMatrixAccess(s, e1,e2)->
