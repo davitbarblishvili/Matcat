@@ -41,13 +41,14 @@ program:
   decls EOF { $1 }
 
 decls:
-   /* nothing */ { ([], [])               }
- | decls global { (($2 :: fst $1), snd $1) }
- | decls fdecl { (fst $1, ($2 :: snd $1)) }
+   /* nothing */ { ([], []) }
+  | decls global  { (($2 :: fst $1), snd $1) }
+  | decls fdecl   { (fst $1, ($2 :: snd $1)) }
+
+ global:
+    typ ID SEMI         { (($1,$2),Noexpr) }
 
 fdecl:
-    /* if this is func decl, how do we write that we can return as much var as we want */
-	  /* added FUNC, also types which will be what types it returns */
    FUNC ID LPAREN formals_opt RPAREN typ LBRACE stmt_list RBRACE 
      { { 
 	 fname = $2;
@@ -78,16 +79,16 @@ stmt_list:
   | stmt_list stmt { $2 :: $1 }
   
 stmt:
-    expr SEMI                               { Expr $1               }
-  | RETURN expr_opt SEMI                    { Return $2             }
-  | LBRACE stmt_list RBRACE                 { Block(List.rev $2)    }
-  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([])) }
-  | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7)        }
+    expr SEMI                               { Expr $1                     }
+  | RETURN expr_opt SEMI                    { Return $2                   }
+  | LBRACE stmt_list RBRACE                 { Block(List.rev $2)          }
+  | IF LPAREN expr RPAREN stmt %prec NOELSE { If($3, $5, Block([]))       }
+  | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7)              }
   | FOR LPAREN expr_opt SEMI expr SEMI expr_opt RPAREN stmt
-                                            { For($3, $5, $7, $9)   }
-  | WHILE LPAREN expr RPAREN stmt           { While($3, $5)         }
+                                            { For($3, $5, $7, $9)         }
+  | WHILE LPAREN expr RPAREN stmt           { While($3, $5)               }
   | typ ID SEMI                             { Vdecl(($1, $2), Noassign)   }
-  | typ ID ASSIGN expr SEMI                 { Vdecl(($1, $2), $4)       }
+  | typ ID ASSIGN expr SEMI                 { Vdecl(($1, $2), $4)         }
   
 expr_opt:
     /* nothing */ { Noexpr }
@@ -120,28 +121,22 @@ expr:
   | LPAREN expr RPAREN { $2                   }
   | expr CR expr     { Binop($1,Cr,$3)        }
   | expr DOT expr    { Binop($1,Dot,$3)       }
-  | LBRACK matrix_value RBRACK        { MatrixLit($2)}
+  | LBRACK matrix_value RBRACK        { MatrixLit($2)                   }
   | ID LBRACK expr RBRACK LBRACK expr RBRACK { MatrixAccess($1, $3, $6) }
-  | ID LBRACK expr COMMA COLON RBRACK { MatrixAccess1D($1, $3) }
-  | ID LBRACK COLON COMMA expr RBRACK { MatrixAccessCol($1, $5) }
-  | ID CIRCU expr                     { MatrixPower($1, $3)}
-
-
-global:
-  |typ ID SEMI         { (($1,$2),Noexpr) }
-  |typ ID ASSIGN expr SEMI { (($1,$2),$4) }
+  | ID LBRACK expr COMMA COLON RBRACK { MatrixAccess1D($1, $3)          }
+  | ID LBRACK COLON COMMA expr RBRACK { MatrixAccessCol($1, $5)         }
+  | ID CIRCU expr                     { MatrixPower($1, $3)             }
 
 args_opt:
     /* nothing */ { [] }
   | args_list  { List.rev $1 }
-
   
 args_list:
     expr                    { [$1] }
   | args_list COMMA expr    { $3 :: $1 }
 
 matrix_value:
-  LBRACK args_opt RBRACK                   { [MatrixLit(List.rev $2)] }
+  LBRACK args_opt RBRACK                    { [MatrixLit(List.rev $2)]   }
 | LBRACK args_opt RBRACK COMMA matrix_value { MatrixLit(List.rev $2)::$5 }
 | LBRACK args_opt RBRACK matrix_value       { MatrixLit(List.rev $2)::$4 }
 
