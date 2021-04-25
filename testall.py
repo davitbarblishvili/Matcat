@@ -1,8 +1,9 @@
 """
 Author:         Andreas
 Description:    Replace testall.sh
-Requirements:   Python >3.6, the imported libraries
+Requirements:   Python >3.6, and the imported libraries
 Usage:
+                Check if matcat.native is built
                 Check if there is any weird file in ./tests
                 Step through a list of files
                 Compile, run, and check the output of each expected-to-work test
@@ -72,17 +73,18 @@ def get_fname(file):
     fname = os.path.splitext(base)[0]
     return fname
 
+
 def clean_up(fname):
     os.remove(f"./{fname}.ll")
     os.remove(f"./{fname}.s")
     os.remove(f"./{fname}.exe")
 
+
+# Book keeping vars
 checked = 0
 skipped = 0
 passed = 0
-pos_passed = 0
-neg_passed = 0
-for test in positive_tests:
+for test in positive_tests + negative_tests:
     is_positive_test = test in positive_tests
     expected_fname = get_fname(test)
 
@@ -125,7 +127,7 @@ for test in positive_tests:
             print_g("PASSED. Failed at llvm compile.")
         else:
             print_r("FAILED")
-        
+
         clean_up(fname)
         continue
 
@@ -138,26 +140,37 @@ for test in positive_tests:
         s = clang_compile.stderr.decode()
         if not is_positive_test:
             passed += 1
-            print_r("PASSED, but it failed at clang compile.")
+            print_r("PASSED, clang compile failed, maybe sth is wrong.")
         else:
-            print_r("FAILED")
-        
+            print_r("FAILED, clang compile failed.")
+
         clean_up(fname)
         continue
 
     # a *.exe file shoulbe be generated at this point
+
+    if not is_positive_test:
+        print_r("FAILED, it should not compile.")
+        clean_up(fname)
+        continue
+
     # compare their results
     run_exe = subprocess.run([f"./{fname}.exe"],
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if clang_compile.returncode != 0:
-        print_w("This shouldn't happen")
+        print_r("FAILED. Failed at running time. Maybe something is wrong")
         clean_up(fname)
         continue
 
-    run_result = run_exe.stdout.decode()
+    run_result = run_exe.stdout.decode().rstrip()
     test_op_path = os.path.join(TESTS_DIR_NAME, f"{fname}{OUT}")
-    if run_result != open(test_op_path).read():
+    expected_result = open(test_op_path).read().rstrip()
+    if run_result != expected_result:
         print_r("FAILED. Output does not match.")
+
+        # These are processed strings without trailing spaces
+        print(f"\tExpected: {expected_result.encode()}")
+        print(f"\tActual:   {run_result.encode()}")
         clean_up(fname)
         continue
 
