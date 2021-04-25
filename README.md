@@ -47,8 +47,35 @@ The executable and the intermediate files `(.s, .ll)` will be run and deleted af
 
 ## Testing
 
-To run the automated test-suite, run:
+We have used two test-suites in this project. They are written in shell script and python.
+
+To run the automated test-suite that written in shell script, run:
 
 ```make test```
 
-This will run all the existing test cases (tests/test-print.mc shows a hello world example in matcat).
+To run the one written in python, run:
+
+```python testall.py```
+
+(Please make sure you have installed python >=3.6 and other required libraries.)
+(You may needs `py`, `py3`, or `python3` depending on your system configurations.)
+
+Both of them will run all the existing test cases in `./tests` (tests/test-print.mc shows a hello world example in matcat).
+
+## References
+
+[MicroC](http://www.cs.columbia.edu/~sedwards/classes/2021/4115-spring/microc.tar.gz)
+
+- We start our project with MicroC
+
+[PixelPlusPlus](https://github.com/maobowen/PixelPlusPlus/)
+
+- Our Vdecl took a lot of their ideas in declaring variables as a statement: make sure the symbol table is updated in each statement and the way we look for the which scope a variable belongs to.
+
+[Shoo](https://github.com/sam-jay/shoo-lang/)
+
+- We followed their format and the designs in their LRM and Final Report
+
+[Coral](https://github.com/jacobaustin123/Coral)
+
+- We followed their format and the designs in their LRM and Final Report

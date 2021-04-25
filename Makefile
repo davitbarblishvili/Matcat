@@ -1,4 +1,3 @@
-
 .PHONY : all
 all : matcat.native matrixLibrary.o
 
@@ -28,6 +27,7 @@ scanner.ml : scanner.mll
 clean : 
 	ocamlbuild -clean
 	rm -rf testall.log ocamlllvm *.diff *.err *.ll *.lli *.exe *.out *.s matcat.native *.o *.bc
+	
 .PHONY : test
 test : matcat.native
 	./testall.sh
