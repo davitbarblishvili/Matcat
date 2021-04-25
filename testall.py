@@ -72,6 +72,10 @@ def get_fname(file):
     fname = os.path.splitext(base)[0]
     return fname
 
+def clean_up(fname):
+    os.remove(f"./{fname}.ll")
+    os.remove(f"./{fname}.s")
+    os.remove(f"./{fname}.exe")
 
 checked = 0
 skipped = 0
@@ -121,6 +125,8 @@ for test in positive_tests:
             print_g("PASSED. Failed at llvm compile.")
         else:
             print_r("FAILED")
+        
+        clean_up(fname)
         continue
 
     # a *.s file should be generated at this point
@@ -135,6 +141,8 @@ for test in positive_tests:
             print_r("PASSED, but it failed at clang compile.")
         else:
             print_r("FAILED")
+        
+        clean_up(fname)
         continue
 
     # a *.exe file shoulbe be generated at this point
@@ -143,16 +151,19 @@ for test in positive_tests:
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if clang_compile.returncode != 0:
         print_w("This shouldn't happen")
+        clean_up(fname)
         continue
 
     run_result = run_exe.stdout.decode()
     test_op_path = os.path.join(TESTS_DIR_NAME, f"{fname}{OUT}")
     if run_result != open(test_op_path).read():
         print_r("FAILED. Output does not match.")
+        clean_up(fname)
         continue
 
     print_g("PASSED")
     passed += 1
+    clean_up(fname)
 
 print("\nTest summary:")
 print_g(f"Passed: {passed}/{checked}")
