@@ -124,7 +124,7 @@ let translate (globals, functions) =
       let symmetry_matrix_t= L.function_type i32_t [|matrx_t|] in
       let symmetry_matrix_f= L.declare_function "check_symmetry" symmetry_matrix_t the_module in 
 
-  let to_imp str = raise (Failure ("Not yet implemented: " ^ str)) in
+  (* let to_imp str = raise (Failure ("To be implemented: " ^ str)) in *)
       
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
     let function_decl m fdecl =
@@ -381,8 +381,10 @@ let translate (globals, functions) =
                   | _ -> expr builder (tp, SAssign(s, e2)) symbol_table3
            in (builder, symbol_table3, pbuilder)
            | SReturn e -> let _ = match fdecl.sdata_type with
-                              A.Int -> L.build_ret (expr builder e symbol_table) builder 
-                            | _ -> to_imp (A.string_of_data_type fdecl.sdata_type)
+                              (* A.Int -> L.build_ret (expr builder e symbol_table) builder
+                            | A.Double -> L.build_ret (expr builder e symbol_table) builder
+                            | A.Matrix -> L.build_ret (expr builder e symbol_table) builder *)
+                            | _ -> L.build_ret (expr builder e symbol_table) builder
                      in (builder, symbol_table, pbuilder)
            | SIf (predicate, then_stmt, else_stmt) ->
               let bool_val = expr builder predicate symbol_table in
