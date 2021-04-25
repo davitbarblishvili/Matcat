@@ -134,7 +134,7 @@ matrix* matrxAdd(matrix* lhs, matrix* rhs) {
   }
   int rows = lhs->num_rows;
   int cols= lhs->num_cols;
-  matrix *result = initMatrix(NULL, rows, cols);
+  matrix *result = initMatrix(NULL, cols, rows);
   for(int i=0; i<rows; i++) {
     for(int j=0; j<cols; j++) {
         int sum = lhs->matrixAddr[i][j] + rhs->matrixAddr[i][j];
@@ -152,7 +152,7 @@ matrix* matrxSub(matrix* lhs, matrix* rhs) {
   }
   int rows = lhs->num_rows;
   int cols= lhs->num_cols;
-  matrix *result = initMatrix(NULL, rows, cols);
+  matrix *result = initMatrix(NULL, cols, rows);
   for(int i=0; i<rows; i++) {
     for(int j=0; j<cols; j++) {
         int sum = lhs->matrixAddr[i][j] - rhs->matrixAddr[i][j];
@@ -191,7 +191,7 @@ matrix* matrxMult(matrix* lhs, matrix* rhs) {
     die("matrix mult size mismatch");
   }
 
-  matrix* originalMatrix =initMatrix(NULL, lhs->num_rows, lhs->num_cols);
+  matrix* originalMatrix =initMatrix(NULL,lhs->num_cols,lhs->num_rows);
 
   for(int i = 0; i < lhs->num_rows;i++){
       for(int j = 0; j < lhs->num_cols; j++){
@@ -311,7 +311,7 @@ float s = 1;
 double det = 0;
 int rows = input->num_rows;
 int cols = input->num_cols; 
-matrix *result = initMatrix(NULL,rows , cols);
+matrix *result = initMatrix(NULL,cols , rows);
 int i, j, m, n, c;
 if (k == 1)
   {
@@ -456,15 +456,12 @@ void exchangeRows (matrix* oMatrix, int r1, int r2) {
 double getValue (matrix* oMatrix, int i, int j) {
 	
 	if ((i < 0) || (j < 0)) {
-		printf ("Error in indexing\n");
-		getchar ();
-		exit (0);
+		printf("Error in indexing\n");
 	}
  
 	if ((i >= oMatrix->num_rows) || (j >= oMatrix->num_cols)) {
 		printf ("Error in indexing: %d, %d\n", i, j);
-		getchar ();
-		exit (0);
+    exit(0);
 	}
  
 	return oMatrix->matrixAddr[i][j];
@@ -476,7 +473,7 @@ matrix* rref_helper(matrix* oMatrix, double tolerance)
 {
 	int currentRow; double factor;
  
-	matrix* oEchelon = initMatrix(NULL,oMatrix->num_rows, oMatrix->num_cols);
+	matrix* oEchelon = initMatrix(NULL, oMatrix->num_cols,oMatrix->num_rows);
  
 	// Make a copy and work on that.
 	for (int i = 0; i < oMatrix->num_rows; i++)
@@ -491,6 +488,7 @@ matrix* rref_helper(matrix* oMatrix, double tolerance)
 			// looking for a nonzero entry, when found, swap it for Arow 
 			currentRow = Arow;
 			do {
+      
 				// next row
 				currentRow++;
 				// Have we reached the end of the rows but we've still got columns left to scan?
@@ -512,8 +510,10 @@ matrix* rref_helper(matrix* oMatrix, double tolerance)
 		// Arow now holds the row of interest }
 		factor = 1.0 / getValue (oEchelon, Arow, Acol);
 		// reduce all the entries along the column by the factor 
-		for (int i = Acol; i < oEchelon->num_cols; i++)
+		for (int i = Acol; i < oEchelon->num_cols; i++){
 			oEchelon->matrixAddr[Arow][i] = getValue (oEchelon, Arow, i) * factor;
+       
+    }
  
 		// now eliminate all entries above and below Arow, this generates the reduced form 
 		for (int i = 0; i < oEchelon->num_rows; i++) {
@@ -533,8 +533,8 @@ matrix* rref_helper(matrix* oMatrix, double tolerance)
 	return oEchelon;
 }
 
-void rref(matrix* input) {
-  printMatrix(rref_helper(input,1e-6));
+matrix* rref(matrix* input) {
+  return rref_helper(input,1e-6);
 
 }
 
@@ -614,7 +614,7 @@ matrix* get_diagonal(matrix* input){
 matrix* power_matrix(matrix* input, int power){
   if(input->num_rows == input->num_cols){
       if(power < 0 ){
-      matrix* result=initMatrix(NULL, input->num_rows, input->num_cols);
+      matrix* result=initMatrix(NULL, input->num_cols,input->num_rows);
       result = inv(input);
       int newPower = abs(power);
       result = power_matrix_helper(result, newPower);
@@ -622,7 +622,7 @@ matrix* power_matrix(matrix* input, int power){
 
     }
     if( power == 0){
-      matrix* identityMatrix =initMatrix(NULL, input->num_rows, input->num_cols);
+      matrix* identityMatrix =initMatrix(NULL,input->num_cols,input->num_rows);
       for(int i = 0; i < input->num_rows;i++){
             for(int j = 0; j < input->num_cols; j++){
               if(i == j){
@@ -651,8 +651,8 @@ matrix* power_matrix_helper(matrix* input, int power){
   if(power == 1){
     return input;
   }
-  matrix* tempMatrix =initMatrix(NULL, input->num_rows, input->num_cols);
-  matrix* originalMatrix =initMatrix(NULL, input->num_rows, input->num_cols);
+  matrix* tempMatrix =initMatrix(NULL,  input->num_cols, input->num_rows);
+  matrix* originalMatrix =initMatrix(NULL,  input->num_cols,input->num_rows);
 
   for(int i = 0; i < input->num_rows;i++){
       for(int j = 0; j < input->num_cols; j++){
@@ -670,6 +670,30 @@ matrix* power_matrix_helper(matrix* input, int power){
 
   return input;
 
+}
+
+
+void rotate90(matrix* input)
+{
+  if(input->num_cols != input->num_rows){
+    die("I don't like non-squared matrices until my create will add me that feature");
+  }
+  int rows = input->num_rows;
+  int cols = input->num_cols;
+ 
+    // Traverse each cycle
+    for (int i = 0; i < rows / 2; i++) {
+        for (int j = i; j < cols - i - 1; j++) {
+ 
+            // Swap elements of each cycle
+            // in clockwise direction
+            int temp = input->matrixAddr[i][j];
+            input->matrixAddr[i][j] = input->matrixAddr[rows - 1 - j][i];
+            input->matrixAddr[rows - 1 - j][i] = input->matrixAddr[rows - 1 - i][rows - 1 - j];
+            input->matrixAddr[rows - 1 - i][rows - 1 - j] = input->matrixAddr[j][rows - 1 - i];
+            input->matrixAddr[j][rows - 1 - i] = temp;
+        }
+    }
 }
 
 

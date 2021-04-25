@@ -118,6 +118,9 @@ let translate (globals, functions) =
       let power_matrix_t= L.function_type matrx_t[|matrx_t; i32_t|] in
       let power_matrix_f= L.declare_function "power_matrix" power_matrix_t the_module in 
 
+      let rotate90_matrix_t= L.function_type matrx_t[|matrx_t|] in
+      let rotate90_matrix_f= L.declare_function "rotate90" rotate90_matrix_t the_module in 
+
   let to_imp str = raise (Failure ("Not yet implemented: " ^ str)) in
       
   let function_decls : (L.llvalue * sfunc_decl) StringMap.t =
@@ -335,6 +338,9 @@ let translate (globals, functions) =
 
         | SCall ("get_diagonal", [e]) ->
          L.build_call access_matrixdiagonal_f [| (expr builder e symbol_table) |] "get_diagonal" builder
+
+        | SCall ("rotate90", [e]) ->
+          L.build_call rotate90_matrix_f [| (expr builder e symbol_table) |] "rotate90" builder
 
 
         | SCall (f, args) ->
