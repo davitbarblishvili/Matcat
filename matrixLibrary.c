@@ -636,9 +636,8 @@ matrix* power_matrix(matrix* input, int power){
       return identityMatrix;
     }
   if(power > 0){
-     printMatrix(power_matrix_helper(input,power));
-     return input;
-
+     return power_matrix_helper(input,power);
+    
   }
   }else{
     die("I need squared matrix to continue calculations");

@@ -1,8 +1,8 @@
 func main() int {
     matrix a;
     matrix b;
-    a = [[1,2,3],[4,5,6],[7,8,9]];
-    b = a^5;
+    a = [[1,2,2],[4,5,6],[7,0,9]];
+    b = a^-3;
 
     printm(b);
 
