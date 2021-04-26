@@ -561,6 +561,7 @@ matrix* accessMatrix(matrix* input, int row, int col){
 
 matrix* accessMatrix1D(matrix* input, int row){
   if(row >= input->num_rows){
+    
     die("Matrix index out of bound");
   }
 

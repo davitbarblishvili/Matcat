@@ -6,6 +6,7 @@ module A = Ast
 module S = Sast
 open Sast
 
+
 module StringMap = Map.Make(String)
 
 (* translate : Sast.program -> Llvm.module *)
@@ -22,7 +23,7 @@ let translate (globals, functions) =
   let i32_t      = L.i32_type    context
   and i8_t       = L.i8_type     context
   and i1_t       = L.i1_type     context
-  and double_t    = L.double_type context
+  and double_t   = L.double_type context
   and void_t     = L.void_type   context
   and matrx_t    = L.pointer_type (match L.type_by_name llm "struct.matrix" with
       None -> raise (Failure "Missing implementation for struct Matrix")
@@ -145,11 +146,6 @@ let translate (globals, functions) =
     and float_format_str = L.build_global_stringptr "%g\n" "fmt" builder 
     and string_format_str = L.build_global_stringptr "%s\n" "fmt" builder
 
-    (*
-    and double_format_str = L.build_global_stringptr "%g\n" "fmt" builder
-    and matrix_format_str = L.build_global_stringptr "%g " "fmt" builder
-    and return_format_str = L.build_global_stringptr "\n" "fmt" builder
-    *)
     in
     let add_local (m, tmp_builder) (t, n) = 
       let local_var = L.build_alloca (ltype_of_typ t) n tmp_builder
@@ -190,8 +186,7 @@ let translate (globals, functions) =
         let contents' = expr_list contents
         in
         let m = L.build_call matrix_init_f [| L.const_int i32_t cols; L.const_int i32_t rows |] "matrix_init" builder
-        in
-        
+        in        
         ignore(List.map (fun v -> L.build_call store_matrix_f [| m ; v |] "storeEntries" builder) contents'); m
       | SNoexpr     -> L.const_int i32_t 0
       | SNoassign   -> init tp

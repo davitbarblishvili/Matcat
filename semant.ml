@@ -235,6 +235,7 @@ module StringMap = Map.Make(String)
           else if List.length d = 2 then (Matrix, SMatrixLit ( (List.map expr_mapper (flatten (List.tl d) l)), List.hd d, List.hd (List.tl d)))
           else if List.length d = 1 then (Matrix, SMatrixLit ( (List.map expr_mapper (flatten (List.tl d) l)), List.hd d, 1))
           else (Matrix, SMatrixLit ( (List.map expr_mapper l ), 0,0))
+
         | MatrixAccess(s,e1,e2)->
           (Matrix, SMatrixAccess(s, expr e1 symbols, expr e2 symbols))
 
@@ -242,7 +243,6 @@ module StringMap = Map.Make(String)
           (Matrix, SMatrixAccess1D(s, expr e1 symbols))
         | MatrixAccessCol(s,e1)->
           (Matrix, SMatrixAccessCol(s, expr e1 symbols))
-
         | MatrixPower(s,e1)->
           (Matrix, SMatrixPower(s, expr e1 symbols))
 
@@ -316,8 +316,7 @@ module StringMap = Map.Make(String)
         | While(p, s) -> SWhile(check_bool_expr p symbols, fst(check_stmt s symbols)), symbols
         | Return e -> let (t, e') = expr e symbols in
         if t = func.data_type then SReturn (t, e'), symbols
-        else raise (
-	      Failure ("return gives " ^ string_of_data_type t ^ " expected " ^
+        else raise (Failure ("return gives " ^ string_of_data_type t ^ " expected " ^
 		   string_of_data_type func.data_type ^ " in " ^ string_of_expr e))
         
         (* A block is correct if each statement is correct and nothing

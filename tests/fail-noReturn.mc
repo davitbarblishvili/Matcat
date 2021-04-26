@@ -3,5 +3,4 @@ func main() int {
     m = [[1,2,3]];
     printm(m);
 
-
 }
