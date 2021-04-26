@@ -127,9 +127,15 @@ matrix* storeEntries(matrix* target, int value) {
     return target;
 }
 
+int has_same_dim(matrix* lhs, matrix* rhs){
+  int same_num_rows = lhs->num_rows == rhs->num_rows;
+  int same_num_cols = lhs->num_cols == rhs->num_cols;
+  return same_num_rows && same_num_cols;
+}
+
 matrix* matrxAdd(matrix* lhs, matrix* rhs) {
   //check dimensions
-  if (lhs->num_rows != rhs->num_rows || lhs->num_cols != rhs->num_rows) {
+  if (!has_same_dim(lhs, rhs)) {
     die("matrix add size mismatch");
   }
   int rows = lhs->num_rows;
@@ -147,7 +153,7 @@ matrix* matrxAdd(matrix* lhs, matrix* rhs) {
 
 matrix* matrxSub(matrix* lhs, matrix* rhs) {
   //check dimensions
-  if (lhs->num_rows != rhs->num_rows || lhs->num_cols != rhs->num_rows) {
+  if (!has_same_dim(lhs, rhs)) {
     die("matrix sub size mismatch");
   }
   int rows = lhs->num_rows;
