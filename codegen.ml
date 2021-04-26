@@ -1,5 +1,6 @@
-(*this codegen file is ONLY intended for printing "hello world". To be able to debug and easily manipulate the code,
-I have removed part of the code that is not involved in printing "hello world" *)
+(*
+Authors: Matcat Team
+*)
 
 module L = Llvm
 module A = Ast

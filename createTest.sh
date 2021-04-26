@@ -1,4 +1,5 @@
 #!/bin/bash
+# Author: James
 # Automate making test files and corresponding .out/.err files
 
 

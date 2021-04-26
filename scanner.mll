@@ -1,3 +1,4 @@
+(* Authors: Matcat Team *)
 (* Ocamllex scanner for Matcat *)
 
 { open Parser } 

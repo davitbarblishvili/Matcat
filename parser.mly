@@ -1,3 +1,4 @@
+/* Author: Matcat Team */
 /* Ocamlyacc parser for Matcat */
 
 %{

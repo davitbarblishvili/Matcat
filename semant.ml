@@ -1,8 +1,4 @@
-(*
-Date        Author        Changes
-2021-03-22  Andreas       Add basic parts based on MicroC to make hello world works
-2021-03-22  Andreas       Add TODOs for further development
-*)
+(* Authors: Matcat Team *)
 
 open Ast
 open Sast

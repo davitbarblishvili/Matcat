@@ -1,4 +1,5 @@
 #!/bin/sh
+# Authors: MicroC testall.sh modified by Davit
 
 # Regression testing script for MicroC
 # Step through a list of files

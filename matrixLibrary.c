@@ -1,3 +1,7 @@
+/*
+Authors:
+Davit, Mariam, Andreas (minor fixes only)
+*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

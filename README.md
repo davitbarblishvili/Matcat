@@ -1,3 +1,7 @@
+<!-- Authors:
+Matcat Team:    Language Spec
+Andreas:        Write-up from Configuration to References
+-->
 # Matcat
 
 The Matcat language is an imperative, mathematically-inclined, and C-like language that supports convenient matrix manipulation for Linear Algebra.
