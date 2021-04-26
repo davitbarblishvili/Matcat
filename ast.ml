@@ -33,8 +33,6 @@ type expr =
 | Noexpr
 | Noassign
 
-type global = bind * expr
-
 type stmt =
   Block of stmt list
 | Expr of expr
@@ -53,7 +51,7 @@ type func_decl = {
     body : stmt list;
   }
 
-type program = global list * func_decl list
+type program = stmt list * func_decl list
 
 
 let string_of_operator = function
@@ -146,8 +144,8 @@ let string_of_global (b, e) =
   else string_of_bind b ^" = "^ string_of_expr e ^ ";\n"
 
 
-let string_of_program (vars, funcs) =
-  String.concat "" (List.map string_of_global vars) ^ "\n" ^
-  String.concat "\n" (List.map string_of_fdecl funcs)
+let string_of_program (stmts, funcs) =
+  String.concat "\n" (List.map string_of_fdecl funcs) ^ "\n" ^
+  String.concat "" (List.map string_of_stmt stmts)
 
   

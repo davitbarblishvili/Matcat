@@ -42,7 +42,7 @@ program:
 
 decls:
    /* nothing */ { ([], []) }
-  | decls global  { (($2 :: fst $1), snd $1) }
+  | stmt decls    { (($1 :: fst $2), snd $2) }
   | decls fdecl   { (fst $1, ($2 :: snd $1)) }
 
  global:
