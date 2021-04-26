@@ -30,7 +30,7 @@ let translate (globals, functions) =
       None -> raise (Failure "Missing implementation for struct Matrix")
     | Some t -> t)
   in
-  (* Return the LLVM type for a MicroC type *)
+  (* Return the LLVM type for a Matcat type *)
   let ltype_of_typ = function
     | A.String -> L.pointer_type (L.array_type i8_t 100)
     | A.Void  -> void_t

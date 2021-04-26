@@ -1,7 +1,7 @@
 #!/bin/sh
 # Authors: MicroC testall.sh modified by Davit
 
-# Regression testing script for MicroC
+# Regression testing script for Matcat
 # Step through a list of files
 #  Compile, run, and check the output of each expected-to-work test
 #  Compile and check the error of each expected-to-fail test
@@ -16,10 +16,7 @@ LLC="llc"
 # Path to the C compiler
 CC="cc"
 
-# Path to the microc compiler.  Usually "./microc.native"
-# Try "_build/microc.native" if ocamlbuild was unable to create a symbolic link.
 MATCAT="./matcat.native"
-#MICROC="_build/microc.native"
 
 # Set time limit for all operations
 ulimit -t 30

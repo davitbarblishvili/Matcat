@@ -1,3 +1,4 @@
+# Authors: Matcat Team, modified from MicroC and referenced Shoo
 .PHONY : all
 all : clean matcat.native matrixLibrary.o
 
@@ -33,10 +34,9 @@ test : matcat.native
 	./testall.sh
 
 # An excluding way to build the tarball
-# may not be a good idea, but let's try for a while
-EXCLUDEPATTERNS = .* *_build* MicroC *.log
+EXCLUDEPATTERNS = .* *_build* *.log *.pdf
 ECSTRING = $(EXCLUDEPATTERNS:%= --exclude="%" )
+current_dir = $(PWD)
 tar : clean
 	echo ${ECSTRING}
-	cd .. && tar ${ECSTRING} -cvf matcat/matcat.tar.gz matcat
-
+	cd .. && tar ${ECSTRING} -cvf ${current_dir}/matcat.tar.gz matcat
