@@ -28,6 +28,7 @@ type expr =
 | MatrixAccess of string * expr * expr
 | MatrixAccess1D of string * expr
 | MatrixAccessCol of string * expr
+| MatrixDiagonal of string
 | MatrixPower of string * expr
 | Noexpr
 | Noassign
@@ -103,6 +104,7 @@ let rec string_of_expr = function
     | MatrixAccess(s,e1,e2)-> "MatrixAccess " ^ s ^ "[" ^ string_of_expr(e1) ^ "]" ^ "[" ^ string_of_expr(e2) ^ "]"
     | MatrixAccess1D(s,e1)-> "MatrixAccess1D " ^ s ^ "[" ^ string_of_expr(e1) ^ ",:]"
     | MatrixAccessCol(s,e1)-> "MatrixAccessCol " ^ s ^ "[:," ^ string_of_expr(e1) ^ "]"
+    | MatrixDiagonal(s)-> "MatrixDiagonal " ^ s ^ "[:, :]"
     | MatrixPower(s,e1) -> "MatrixPower " ^ s ^"^" ^ string_of_expr(e1)
     | Call(f, el) ->
         f ^ "(" ^ String.concat ", " (List.map string_of_expr el) ^ ")"

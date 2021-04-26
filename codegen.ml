@@ -212,7 +212,10 @@ let translate (globals, functions) =
         and matrxPtr = L.build_load (lookup s symbol_table) s builder in
         L.build_call access_matrixcol_f [|matrxPtr; e1'|] "accessMatrixCol" builder
 
-
+      | SMatrixDiagonal(s)->
+        let matrxPtr = L.build_load (lookup s symbol_table) s builder in
+        L.build_call access_matrixdiagonal_f [| (matrxPtr) |] "get_diagonal" builder
+       
 
       | SAssign (s, e) -> let e' = expr builder e symbol_table in
                           ignore(L.build_store e' (lookup s symbol_table) builder); e'

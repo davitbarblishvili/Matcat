@@ -243,6 +243,8 @@ module StringMap = Map.Make(String)
           (Matrix, SMatrixAccess1D(s, expr e1 symbols))
         | MatrixAccessCol(s,e1)->
           (Matrix, SMatrixAccessCol(s, expr e1 symbols))
+        | MatrixDiagonal(s)->
+          (Matrix, SMatrixDiagonal(s))
         | MatrixPower(s,e1)->
           (Matrix, SMatrixPower(s, expr e1 symbols))
 

@@ -126,6 +126,7 @@ expr:
   | ID LBRACK expr COMMA COLON RBRACK { MatrixAccess1D($1, $3)          }
   | ID LBRACK COLON COMMA expr RBRACK { MatrixAccessCol($1, $5)         }
   | ID CIRCU expr                     { MatrixPower($1, $3)             }
+  | ID LBRACK COLON COMMA COLON RBRACK { MatrixDiagonal($1)         }
 
 args_opt:
     /* nothing */ { [] }

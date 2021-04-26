@@ -21,6 +21,7 @@ and sx =
   | SMatrixAccess of string * sexpr * sexpr
   | SMatrixAccess1D of string * sexpr
   | SMatrixAccessCol of string * sexpr
+  | SMatrixDiagonal of string
   | SMatrixPower of string * sexpr
   | SNoexpr
   | SNoassign
@@ -64,6 +65,7 @@ let rec string_of_sexpr (t, e) =
     | SMatrixAccess(s,e1,e2)-> "SMatrixAccess " ^ s ^ "[" ^ string_of_sexpr(e1) ^ "]" ^ "[" ^ string_of_sexpr(e2) ^ "]"
     | SMatrixAccess1D(s,e1)-> "SMatrixAccess1D " ^ s ^ "[" ^ string_of_sexpr(e1) ^ ",:]"
     | SMatrixAccessCol(s,e1)-> "SMatrixAccessCol " ^ s ^ "[:," ^ string_of_sexpr(e1) ^ "]"
+    | SMatrixDiagonal(s)-> "MatrixDiagonal " ^ s ^ "[:, :]"
     | SMatrixPower(s,e1) -> "SMatrixPower " ^ s ^"^" ^ string_of_sexpr(e1)
     | SCall(f, el) ->
         f ^ "(" ^ String.concat ", " (List.map string_of_sexpr el) ^ ")"
