@@ -24,10 +24,10 @@ Other than installing Ocaml and LLVM manually, you may also run a docker to buil
 You may run the following commands to set up the docker environment:
 
 ```
-docker build . -t mcDocker
-docker run --rm -it -v `pwd`:/home/mc -w=/home/mc mcDocker
+docker build . -t mcdocker
+docker run --rm -it -v `pwd`:/home/mc -w=/home/mc mcdocker
 ```
-
+(This may takes a while.)
 
 ### Building the Language
 
