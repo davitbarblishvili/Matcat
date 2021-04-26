@@ -1,3 +1,5 @@
+# Author: Based on MicroC by Andreas
+
 # Include the llvm and llvm.analysis packages while compiling
 true: package(llvm), package(llvm.analysis)
 
@@ -5,5 +7,4 @@ true: package(llvm), package(llvm.analysis)
 true : warn(+a-4)
 
 # Instruct ocamlbuild to ignore the "printbig.o" file when it's building
-"printbig.o": not_hygienic
-
+"matrixLibrary.o": not_hygienic
