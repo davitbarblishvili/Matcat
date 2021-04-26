@@ -23,13 +23,19 @@ for file in mcFiles:
         content = f.read()
         first_line = content.splitlines()[0]
         if first_line.startswith(("/*", "//")):
-            print(f"{file} is signed.")
+            # print(f"{file} is signed.")
             continue
         
         commits = repo.iter_commits('--all', paths=file)
         print(file)
         authors = []
         for commit in commits:
+            hexsha = commit.hexsha
+
+            # ignore MicroC creation/removal commits
+            if hexsha.startswith(("3b6f80de","0e29cf4")):
+                continue
+
             author = commit.committer.name.split()[0]
             if author in authors or author.startswith("GitHub"):
                 continue

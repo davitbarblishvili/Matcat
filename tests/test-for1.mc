@@ -1,3 +1,4 @@
+// Author: James
 func main() int
 {
   int i;
