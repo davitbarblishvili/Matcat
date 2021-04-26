@@ -58,6 +58,7 @@ void printMatrix(matrix* input) {
         printf("\n");
     }
     printf(")");
+    printf("\n");
 
 }
 
