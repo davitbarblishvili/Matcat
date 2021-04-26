@@ -56,9 +56,9 @@ This shell-script runs the executable `.exe` and deletes the intermediate files 
 
 ## Testing
 
-We have used two test-suites in this project. They are written in shell script and python.
+We have used two test suites in this project. They are written in shell script and python.
 
-To run the automated test-suite that written in shell script, run:
+To run the automated test suite that written in shell script, run:
 
 ```make test```
 
@@ -91,11 +91,14 @@ To test on those cases for further developments, run:
 [PixelPlusPlus](https://github.com/maobowen/PixelPlusPlus/)
 
 - Our Vdecl took a lot of their ideas in declaring variables as a statement: make sure the symbol table is updated in each statement and the way we look for the which scope a variable belongs to.
+- We also referenced their reports
 
 [Shoo](https://github.com/sam-jay/shoo-lang/)
 
-- We followed their format and the designs in their LRM and Final Report
+- We followed their format and the designs in their LRM and Final Report.
+- We also referenced their project files
 
 [Coral](https://github.com/jacobaustin123/Coral)
 
 - We followed their format and the designs in their LRM and Final Report
+- We also referenced their project files
