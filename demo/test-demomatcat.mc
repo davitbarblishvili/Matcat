@@ -1,3 +1,4 @@
+// Authors: Mariam, Davit
 func main() int{
     matrix m;
     matrix c;

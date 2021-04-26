@@ -1,4 +1,4 @@
-// Author: Davit, James
+// Authors: Davit, James
 func main() int
 {
   int i;
