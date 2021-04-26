@@ -4,6 +4,9 @@ The Matcat language is an imperative, mathematically-inclined, and C-like langua
 
 This is a class project for [COMS W4115 Programming Languages and Translators, Spring 2021](http://www.cs.columbia.edu/~sedwards/classes/2021/4115-spring/index.html) at [Columbia University](http://columbia.edu/).
 
+You may access our slide on [Google Docs](https://docs.google.com/presentation/d/1MoQVbeum-jw_jTtWlupsRLKKKvEfNfGaYfrDNGnQn_Y/).
+
+You can also find it on the [class website](http://www.cs.columbia.edu/~sedwards/classes/2021/4115-spring/index.html).
 
 ## Configuration
 
