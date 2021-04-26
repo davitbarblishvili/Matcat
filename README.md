@@ -1,6 +1,6 @@
 # Matcat
 
-The Matcat language is an imperative, mathematically-inclined, and C-like language that supports efficient matrix manipulation for Linear Algebra.
+The Matcat language is an imperative, mathematically-inclined, and C-like language that supports convenient matrix manipulation for Linear Algebra.
 
 This is a class project for COMS W4115 Programming Languages and Translators, Spring 2021 at Columbia University.
 
@@ -13,7 +13,7 @@ Our compiler is developed and has been tested on
 
 To set up the environment to build the language, please install Ocaml and LLVM.
 
-The instructions of installing Ocaml and LLVM can be found here:
+The instructions for installing Ocaml and LLVM can be found here:
 - https://ocaml.org/docs/install.html
 - https://llvm.org/docs/GettingStartedTutorials.html
 
@@ -42,7 +42,7 @@ To compile and run a Matcat program, run:
 
 ```./run.sh <NAME_OF_THE_PROGRAM>.mc```
 
-The executable and the intermediate files `(.s, .ll)` will be run and deleted after execution.
+The executable and the intermediate files (`.s`, `.ll`) will be run and deleted after execution.
 
 
 ## Testing
@@ -60,7 +60,17 @@ To run the one written in python, run:
 (Please make sure you have installed python >=3.6 and other required libraries.)
 (You may needs `py`, `py3`, or `python3` depending on your system configurations.)
 
-Both of them will run all the existing test cases in `./tests` (tests/test-print.mc shows a hello world example in matcat).
+Both of them will run all the existing test cases in `./tests` (`tests/test-print.mc` shows a hello world example in matcat).
+
+### Test cases for future improvements
+
+There are some features we designed, but we haven't finished them. 
+
+To test on those cases for further developments, run:
+
+```py testall.py --dir future_improvements```
+
+(Not supported by `testall.sh`)
 
 ## References
 

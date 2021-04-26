@@ -1,5 +1,5 @@
 .PHONY : all
-all : matcat.native matrixLibrary.o
+all : clean matcat.native matrixLibrary.o
 
 matcat.native : matrixLibrary.bc
 	opam config exec -- \
