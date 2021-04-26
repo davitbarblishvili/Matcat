@@ -59,7 +59,8 @@ To run the one written in python, run:
 
 ```python testall.py```
 
-(Please make sure you have installed python >=3.6 and other required libraries.)
+(Please make sure you have installed python >=3.6 and other required packages like `colorama`.)
+
 (You may needs `py`, `py3`, or `python3` depending on your system configurations.)
 
 Both of them will run all the existing test cases in `./tests` (`tests/test-print.mc` shows a hello world example in matcat).
