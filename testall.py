@@ -3,17 +3,21 @@ Author:         Andreas
 Description:    Replace testall.sh
 Requirements:   Python >3.6, and the imported libraries
 Usage:
+                py testall.py <test_dir, default: tests>
                 Check if matcat.native is built
                 Check if there is any weird file in ./tests
                 Step through a list of files
                 Compile, run, and check the output of each expected-to-work test
                 Compile and check the error of each expected-to-fail test
 References:
-                https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
+                https://docs.python.org/3/library/argparse.html
                 https://docs.python.org/3/library/fnmatch.html#fnmatch.fnmatch
+                https://stackoverflow.com/questions/3207219/how-do-i-list-all-files-of-a-directory
                 https://stackoverflow.com/questions/678236/how-to-get-the-filename-without-the-extension-from-a-path-in-python
                 https://stackoverflow.com/questions/3751900/create-file-path-from-variables
                 https://stackoverflow.com/questions/54208417/how-to-check-if-popen-from-subprocess-throws-an-error
+                https://stackoverflow.com/questions/11540854/file-as-command-line-argument-for-argparse-error-message-if-argument-is-not-va
+                https://stackoverflow.com/questions/38834378/path-to-a-directory-as-argparse-argument
 """
 import argparse
 from colorama import Fore, Style
@@ -21,8 +25,6 @@ import fnmatch
 import os
 import subprocess
 
-parser = argparse.ArgumentParser(
-    description='Fancy Integreation Test for Matcat')
 
 LLI = "lli"
 LLC = "llc"
@@ -49,6 +51,23 @@ def print_g(s):
     print(Fore.GREEN + s)
     print(Style.RESET_ALL, end='')
 
+# https://stackoverflow.com/a/51212150/13109740
+def dir_path(string):
+    if os.path.isdir(string):
+        return string
+    else:
+        raise NotADirectoryError(string)
+
+
+parser = argparse.ArgumentParser(
+    description='Fancy Automated Integreation Test for Matcat')
+parser.add_argument('--dir',
+                    dest="tests_dir", default=TESTS_DIR_NAME,
+                    help='select the tests directory', metavar="FILE",
+                    type=dir_path)
+args = parser.parse_args()
+
+tests_dir = args.tests_dir
 
 if MATCAT not in os.listdir("."):
     print_w(f"{MATCAT} not found. Please make Matcat first.")
@@ -57,7 +76,7 @@ if MATCAT not in os.listdir("."):
 positive_tests = []
 negative_tests = []
 expected_res = []
-for file in os.listdir(TESTS_DIR_NAME):
+for file in os.listdir(tests_dir):
     if fnmatch.fnmatch(file, f'test*{MCEXTENSION}'):
         positive_tests.append(file)
     elif fnmatch.fnmatch(file, f'fail*{MCEXTENSION}'):
@@ -101,7 +120,7 @@ for test in positive_tests + negative_tests:
     s = test+"..."
     print(f"{s.ljust(35)}", end='')
 
-    test_path = os.path.join(TESTS_DIR_NAME, test)
+    test_path = os.path.join(tests_dir, test)
     fname = get_fname(test)
 
     llvm = subprocess.run([f"./{MATCAT}", test_path],
@@ -163,7 +182,7 @@ for test in positive_tests + negative_tests:
         continue
 
     run_result = run_exe.stdout.decode().rstrip()
-    test_op_path = os.path.join(TESTS_DIR_NAME, f"{fname}{OUT}")
+    test_op_path = os.path.join(tests_dir, f"{fname}{OUT}")
     expected_result = open(test_op_path).read().rstrip()
     if run_result != expected_result:
         print_r("FAILED. Output does not match.")
