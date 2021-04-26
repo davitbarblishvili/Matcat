@@ -1,3 +1,4 @@
+// Author: James
 func foo(int n) int {
     if (n == 1) {
         return 0;

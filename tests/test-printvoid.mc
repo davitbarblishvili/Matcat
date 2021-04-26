@@ -1,3 +1,4 @@
+// Author: Davit
 func printVoid() void {
     printStr("Hello world");
 }

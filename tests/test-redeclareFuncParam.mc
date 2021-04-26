@@ -1,3 +1,4 @@
+// Author: Davit
 func foo(int x) int {
     int x;
     x = 2; 

@@ -1,3 +1,4 @@
+// Author: James
 func main() int {
     matrix m; 
     m = [[1,2,3]];

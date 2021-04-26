@@ -1,3 +1,4 @@
+// Author: Davit
 func main() int {
     double a;
     double b; 

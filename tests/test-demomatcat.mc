@@ -1,3 +1,4 @@
+// Author: Davit
 func main() int{
     matrix m;
     matrix c;
@@ -60,6 +61,13 @@ func main() int{
 
     rotate90(m);
     printStr("m rotated by 90 is:");
+    printm(m);
+   
+    
+
+
+    return 0;
+});
     printm(m);
    
     
