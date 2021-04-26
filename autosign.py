@@ -2,15 +2,17 @@
 Author: Andreas
 Desc.:  This script sign our testcases
 Refs:   https://gitpython.readthedocs.io/en/stable/tutorial.html
-
+Note:   This script is mostly hard-coded
 """
 
 import os
 from git import Repo
 
 mcFiles = []
+DIR = "tests"
+# DIR = "future_improvements"
 
-for root, dirs, files in os.walk("tests"):
+for root, dirs, files in os.walk(DIR):
     for file in files:
         if file.endswith('.mc'):
             mcFiles.append(os.path.join(root, file))
@@ -25,7 +27,7 @@ for file in mcFiles:
         if first_line.startswith(("/*", "//")):
             # print(f"{file} is signed.")
             continue
-        
+
         commits = repo.iter_commits('--all', paths=file)
         print(file)
         authors = []
@@ -33,7 +35,7 @@ for file in mcFiles:
             hexsha = commit.hexsha
 
             # ignore MicroC creation/removal commits
-            if hexsha.startswith(("3b6f80de","0e29cf4")):
+            if hexsha.startswith(("3b6f80de", "0e29cf4")):
                 continue
 
             author = commit.committer.name.split()[0]
