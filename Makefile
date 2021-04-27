@@ -36,7 +36,7 @@ test : matcat.native
 # An excluding way to build the tarball
 EXCLUDEPATTERNS = .* *_build* *.log *.pdf
 ECSTRING = $(EXCLUDEPATTERNS:%= --exclude="%" )
-current_dir = $(PWD)
+current_dir = $(notdir $(CURDIR))
 tar : clean
 	echo ${ECSTRING}
 	cd .. && tar ${ECSTRING} -cvf ${current_dir}/matcat.tar.gz ${current_dir}
