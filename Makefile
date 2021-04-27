@@ -39,4 +39,4 @@ ECSTRING = $(EXCLUDEPATTERNS:%= --exclude="%" )
 current_dir = $(PWD)
 tar : clean
 	echo ${ECSTRING}
-	cd .. && tar ${ECSTRING} -cvf ${current_dir}/matcat.tar.gz matcat
+	cd .. && tar ${ECSTRING} -cvf ${current_dir}/matcat.tar.gz ${current_dir}
